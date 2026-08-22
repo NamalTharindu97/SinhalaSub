@@ -21,6 +21,7 @@ from .translation import (
     run_translation,
 )
 from .quality import QualityWarning, check_document, grapheme_count
+from .experiment_report import HARNESS_VERSION, REPORT_SCHEMA, build_experiment_report
 
 __all__ = [
     "Cue",
@@ -42,4 +43,7 @@ __all__ = [
     "QualityWarning",
     "check_document",
     "grapheme_count",
+    "HARNESS_VERSION",
+    "REPORT_SCHEMA",
+    "build_experiment_report",
 ]

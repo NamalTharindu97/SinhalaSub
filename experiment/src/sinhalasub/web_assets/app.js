@@ -5,6 +5,7 @@ const state = {
   query: "",
   preparation: null,
   quality: null,
+  session: null,
 };
 const graphemeSegmenter = "Segmenter" in Intl ? new Intl.Segmenter("si", { granularity: "grapheme" }) : null;
 
@@ -38,6 +39,54 @@ function formatTime(milliseconds) {
 
 function graphemeCount(text) {
   return graphemeSegmenter ? Array.from(graphemeSegmenter.segment(text)).length : Array.from(text).length;
+}
+
+function startSession() {
+  state.session = {
+    startedAt: new Date().toISOString(),
+    startedPerformance: performance.now(),
+    activeEditMs: 0,
+    activeSince: null,
+    keyboardActions: 0,
+    editEvents: 0,
+    approvalChanges: 0,
+  };
+}
+
+function startActiveEdit() {
+  if (state.session && state.session.activeSince === null) state.session.activeSince = performance.now();
+}
+
+function stopActiveEdit() {
+  if (!state.session || state.session.activeSince === null) return;
+  state.session.activeEditMs += performance.now() - state.session.activeSince;
+  state.session.activeSince = null;
+}
+
+function sessionPayload() {
+  const now = performance.now();
+  const inProgress = state.session.activeSince === null ? 0 : now - state.session.activeSince;
+  const activeEditMs = Math.round(state.session.activeEditMs + inProgress);
+  const elapsedMs = Math.max(activeEditMs, Math.round(now - state.session.startedPerformance));
+  return {
+    started_at: state.session.startedAt,
+    ended_at: new Date().toISOString(),
+    elapsed_ms: elapsedMs,
+    active_edit_ms: activeEditMs,
+    keyboard_actions: state.session.keyboardActions,
+    edit_events: state.session.editEvents,
+    approval_changes: state.session.approvalChanges,
+    approved_cue_ids: state.document.cues.filter((cue) => cue.approved).map((cue) => cue.id),
+  };
+}
+
+function downloadText(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
 }
 
 function showError(element, message) {
@@ -121,6 +170,7 @@ uploadForm.addEventListener("submit", async (event) => {
     state.query = "";
     state.preparation = null;
     state.quality = null;
+    startSession();
     searchInput.value = "";
     document.querySelectorAll(".filter-button").forEach((button) => button.classList.toggle("active", button.dataset.filter === "all"));
     openWorkspace();
@@ -182,6 +232,13 @@ function createCueCard(cue) {
   target.className = "cue-target";
   target.value = cue.target_text;
   target.setAttribute("aria-label", `Target text for cue ${cue.id}`);
+  target.addEventListener("focus", startActiveEdit);
+  target.addEventListener("blur", stopActiveEdit);
+  target.addEventListener("keydown", (event) => {
+    if (event.key.length === 1 || ["Backspace", "Delete", "Enter"].includes(event.key)) {
+      state.session.keyboardActions += 1;
+    }
+  });
   const characterCount = document.createElement("div");
   characterCount.className = "char-count";
   characterCount.textContent = `${graphemeCount(cue.target_text)} graphemes`;
@@ -189,6 +246,7 @@ function createCueCard(cue) {
     cue.target_text = target.value;
     cue.approved = false;
     state.quality = null;
+    state.session.editEvents += 1;
     targetWrap.querySelector(".warning-list")?.remove();
     characterCount.textContent = `${graphemeCount(target.value)} graphemes`;
     card.classList.remove("reviewed");
@@ -234,6 +292,7 @@ function createCueCard(cue) {
   label.textContent = "Reviewed";
   checkbox.addEventListener("change", () => {
     cue.approved = checkbox.checked;
+    state.session.approvalChanges += 1;
     card.classList.toggle("reviewed", cue.approved);
     updateProgress();
   });
@@ -277,6 +336,8 @@ document.querySelectorAll(".filter-button").forEach((button) => {
 
 document.querySelector("#new-file").addEventListener("click", () => {
   state.document = null;
+  stopActiveEdit();
+  state.session = null;
   fileInput.value = "";
   updateFileChoice(null);
   workspace.hidden = true;
@@ -328,6 +389,29 @@ document.querySelector("#qa-button").addEventListener("click", async () => {
   }
 });
 
+document.querySelector("#report-button").addEventListener("click", async () => {
+  clearError(workspaceError);
+  const button = document.querySelector("#report-button");
+  button.disabled = true;
+  button.textContent = "Building...";
+  try {
+    const report = await postJson("/api/experiment-report", {
+      ...state.document,
+      filename: state.filename,
+      session: sessionPayload(),
+      preparation: state.preparation,
+      quality: state.quality,
+    });
+    const stem = state.filename.replace(/\.(srt|vtt|webvtt)$/i, "");
+    downloadText(`${JSON.stringify(report, null, 2)}\n`, `${stem}.experiment-report.json`, "application/json;charset=utf-8");
+  } catch (error) {
+    showError(workspaceError, error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Experiment report";
+  }
+});
+
 document.querySelector("#export-button").addEventListener("click", async () => {
   clearError(workspaceError);
   const emptyCue = state.document.cues.find((cue) => !cue.target_text.trim());
@@ -340,14 +424,9 @@ document.querySelector("#export-button").addEventListener("click", async () => {
   button.disabled = true;
   try {
     const result = await postJson("/api/export", state.document);
-    const blob = new Blob([result.content], { type: "text/plain;charset=utf-8" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
     const extension = state.document.format === "srt" ? ".srt" : ".vtt";
     const stem = state.filename.replace(/\.(srt|vtt|webvtt)$/i, "");
-    link.download = `${stem}.reviewed${extension}`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    downloadText(result.content, `${stem}.reviewed${extension}`, "text/plain;charset=utf-8");
   } catch (error) {
     showError(workspaceError, error.message);
   } finally {

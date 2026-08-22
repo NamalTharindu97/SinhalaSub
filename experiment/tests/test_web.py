@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from sinhalasub.web import (  # noqa: E402
     WorkspaceHandler,
     export_payload,
+    experiment_report_payload,
     parse_payload,
     prepare_translation_payload,
     quality_payload,
@@ -63,6 +64,29 @@ class PayloadTests(unittest.TestCase):
         self.assertGreater(result["total"], 0)
         self.assertIn("1", result["warnings_by_cue"])
 
+    def test_builds_local_experiment_report(self) -> None:
+        payload = parse_payload({"format": "srt", "content": SRT})
+        payload.update(
+            {
+                "filename": "sample.srt",
+                "session": {
+                    "started_at": "2026-08-22T10:00:00Z",
+                    "ended_at": "2026-08-22T10:00:01Z",
+                    "elapsed_ms": 1000,
+                    "active_edit_ms": 500,
+                    "keyboard_actions": 1,
+                    "edit_events": 1,
+                    "approval_changes": 1,
+                    "approved_cue_ids": ["1"],
+                },
+            }
+        )
+
+        report = experiment_report_payload(payload)
+
+        self.assertEqual(1, report["source"]["cue_count"])
+        self.assertEqual(1, report["review"]["approved_cue_count"])
+
 
 class ServerTests(unittest.TestCase):
     @classmethod
@@ -107,6 +131,28 @@ class ServerTests(unittest.TestCase):
         result = self._post("/api/qa", parsed)
 
         self.assertGreater(result["counts"]["high"], 0)
+
+    def test_experiment_report_endpoint_returns_versioned_report(self) -> None:
+        parsed = self._post("/api/parse", {"format": "srt", "content": SRT})
+        parsed.update(
+            {
+                "filename": "sample.srt",
+                "session": {
+                    "started_at": "2026-08-22T10:00:00Z",
+                    "ended_at": "2026-08-22T10:00:01Z",
+                    "elapsed_ms": 1000,
+                    "active_edit_ms": 0,
+                    "keyboard_actions": 0,
+                    "edit_events": 0,
+                    "approval_changes": 0,
+                    "approved_cue_ids": [],
+                },
+            }
+        )
+
+        report = self._post("/api/experiment-report", parsed)
+
+        self.assertEqual("sinhalasub.experiment-report.v1", report["schema_version"])
 
     def test_parse_endpoint_returns_structured_error(self) -> None:
         request = Request(

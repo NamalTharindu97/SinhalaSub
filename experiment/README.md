@@ -42,6 +42,18 @@ The preparation step accepts comma-separated confirmed character names. It also 
 
 `Run QA` checks the current target text for the pilot defaults: two lines, a soft 40 graphemes per line, 17 graphemes per second, 1-7 second duration, and source cue overlap. These checks create warnings only and never modify source timing.
 
+## Experiment Report
+
+`Experiment report` downloads a versioned JSON file containing:
+
+- Source filename, format, cue count, and SHA-256 hash.
+- Harness/system/provider version fields.
+- Elapsed and active edit time, keyboard actions, edit events, approval changes, and changed cue count.
+- Preparation and QA summaries.
+- Source and final cue text, timings, approval state, and warning codes for evaluator scoring.
+
+Reports download locally and are not retained by the server. The current condition is `manual-source-copy`; provider/model/latency remain `null`, and provider usage/cost remain zero until a live adapter is explicitly approved and configured.
+
 Normalize a subtitle file:
 
 ```sh

@@ -34,6 +34,13 @@ Do not build the full SaaS before the Phase 0 experiment passes. A technically c
 4. If the gate passes, build the pilot-ready web MVP in vertical slices.
 5. Run authorised pilots before adding collaboration, media processing, billing, or enterprise deployment.
 
+## Current Implementation Status
+
+- Phase 1 Slice 1 is implemented in the local Python harness: SRT/WebVTT integrity, normalized export, tests, and GUI.
+- Phase 1 Slice 2 has provider-neutral context blocks and protected-value contracts, but no live baseline or AI adapter.
+- Phase 1 Slice 3 has deterministic QA and versioned local review reports; the frozen three-system runner and blinded packaging remain next.
+- Phase 0 discovery, rights-clean corpus creation, legal review, and the controlled experiment remain required before the product gate.
+
 ## Non-Negotiable Invariants
 
 - Preserve cue count, cue identity, and timestamps in translation-only mode.

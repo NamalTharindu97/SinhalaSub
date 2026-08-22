@@ -12,6 +12,7 @@ import webbrowser
 from .subtitles import Cue, SubtitleDocument, SubtitleError, SubtitleFormat, parse_subtitle, serialize_subtitle
 from .translation import prepare_document
 from .quality import check_document
+from .experiment_report import build_experiment_report
 
 
 WEB_ROOT = Path(__file__).with_name("web_assets")
@@ -83,6 +84,17 @@ def quality_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     return {"warnings_by_cue": by_cue, "counts": counts, "total": len(warnings)}
 
 
+def experiment_report_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    return build_experiment_report(
+        source=_document_from_payload(payload, "text"),
+        target=_document_from_payload(payload, "target_text"),
+        filename=str(payload["filename"]),
+        session=payload["session"],
+        preparation=payload.get("preparation"),
+        quality=payload.get("quality"),
+    )
+
+
 def _document_from_payload(payload: Dict[str, Any], text_field: str) -> SubtitleDocument:
     subtitle_format = SubtitleFormat(payload["format"])
     cues = tuple(
@@ -134,6 +146,7 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
             "/api/parse": parse_payload,
             "/api/prepare-translation": prepare_translation_payload,
             "/api/qa": quality_payload,
+            "/api/experiment-report": experiment_report_payload,
             "/api/export": export_payload,
         }
         action = routes.get(self.path)
