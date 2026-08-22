@@ -1,0 +1,28 @@
+{
+  "schema_version": "sinhalasub.corpus-manifest.v1",
+  "corpus_id": "synthetic-corpus-dry-run-001",
+  "assets": [
+    {
+      "id": "synthetic-dialogue-sample",
+      "genre": "crime-action",
+      "split": "development",
+      "source": "../tests/fixtures/sample.srt",
+      "reference": "../tests/fixtures/candidate-c.srt",
+      "adjudicated_reference": "../tests/fixtures/candidate-c.srt",
+      "provenance": "Fictional repository-authored dialogue created for parser and protocol testing.",
+      "rights": {
+        "basis": "Repository-authored synthetic fixture permitted for testing and distribution.",
+        "evidence": "../tests/fixtures/LICENSE.md"
+      },
+      "annotators": ["synthetic-annotator-1", "synthetic-annotator-2"],
+      "adjudicator": "synthetic-adjudicator",
+      "acceptable_alternatives_documented": true,
+      "reference_independently_authored": true,
+      "challenges": [
+        {"cue_id": "1", "tags": ["ambiguous-name", "terminology"]},
+        {"cue_id": "2", "tags": ["pronoun", "negation"]},
+        {"cue_id": "3", "tags": ["terminology"]}
+      ]
+    }
+  ]
+}

@@ -36,6 +36,13 @@ from .evaluation import (
     RUBRIC_DIMENSIONS,
     aggregate_evaluator_responses,
 )
+from .corpus import (
+    AUDIT_SCHEMA,
+    CORPUS_SCHEMA,
+    REQUIRED_CHALLENGES,
+    REQUIRED_GENRES,
+    audit_corpus_manifest,
+)
 
 __all__ = [
     "Cue",
@@ -70,4 +77,9 @@ __all__ = [
     "RESPONSE_SCHEMA",
     "RUBRIC_DIMENSIONS",
     "aggregate_evaluator_responses",
+    "AUDIT_SCHEMA",
+    "CORPUS_SCHEMA",
+    "REQUIRED_CHALLENGES",
+    "REQUIRED_GENRES",
+    "audit_corpus_manifest",
 ]

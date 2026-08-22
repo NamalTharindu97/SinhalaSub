@@ -87,6 +87,19 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli \
 
 The output contains unblinded system-level rubric means, preference rates with 95% Wilson intervals, critical-error totals, and Fleiss' kappa for preference agreement. Keep both the key and analysis confidential until evaluator scoring is locked.
 
+## Evaluation Corpus Audit
+
+Audit the small synthetic corpus manifest while explicitly allowing its expected not-ready status:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.corpus_cli \
+  experiment/examples/corpus-manifest.json \
+  --output /tmp/sinhalasub-corpus-audit.json \
+  --allow-not-ready
+```
+
+Without `--allow-not-ready`, the command exits with status 2 until a valid corpus reaches all frozen composition thresholds. Invalid provenance/rights/annotation/structure data always exits with status 1. The audit records relative paths and normalized hashes; it verifies manifest controls but does not replace legal review of rights evidence.
+
 Normalize a subtitle file:
 
 ```sh
