@@ -21,6 +21,14 @@ Run one test module:
 python3 -m unittest experiment.tests.test_subtitles -v
 ```
 
+Start the local review workspace:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.web --open
+```
+
+Then open `http://127.0.0.1:8765`. The workspace accepts an SRT/WebVTT file, keeps timing locked, lets you edit target text, and exports a reviewed copy. It runs locally and does not translate text with AI yet.
+
 Normalize a subtitle file:
 
 ```sh

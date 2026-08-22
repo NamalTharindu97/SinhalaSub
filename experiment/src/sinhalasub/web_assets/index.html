@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Local subtitle review workspace for SinhalaSub experiments">
+    <title>SinhalaSub Review Workspace</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="brand" href="/" aria-label="SinhalaSub home">
+        <span class="brand-mark" aria-hidden="true">සි</span>
+        <span>
+          <strong>SinhalaSub</strong>
+          <small>Local review workspace</small>
+        </span>
+      </a>
+      <div class="local-badge"><span aria-hidden="true"></span> Local only</div>
+    </header>
+
+    <main>
+      <section id="welcome" class="welcome" aria-labelledby="welcome-title">
+        <div class="welcome-copy">
+          <p class="eyebrow">Phase 0 experiment</p>
+          <h1 id="welcome-title">Shape every line.<br><em>Keep every moment.</em></h1>
+          <p class="lede">Open an English subtitle file, review each cue beside an editable target, and export without changing cue IDs or timing.</p>
+          <ul class="promise-list" aria-label="Workspace guarantees">
+            <li><span>01</span> SRT and WebVTT</li>
+            <li><span>02</span> Timing stays locked</li>
+            <li><span>03</span> Nothing leaves this computer</li>
+          </ul>
+        </div>
+
+        <form id="upload-form" class="upload-card">
+          <div class="upload-number">01 / OPEN</div>
+          <label id="drop-zone" class="drop-zone" for="subtitle-file">
+            <span class="upload-glyph" aria-hidden="true">↑</span>
+            <strong>Choose a subtitle file</strong>
+            <span>or drop it here</span>
+            <small>.srt, .vtt, or .webvtt · maximum 2 MiB</small>
+          </label>
+          <input id="subtitle-file" type="file" accept=".srt,.vtt,.webvtt" required>
+          <div id="file-choice" class="file-choice" aria-live="polite">No file selected</div>
+          <button class="primary-button" type="submit">Open workspace <span aria-hidden="true">→</span></button>
+          <p id="upload-error" class="error-message" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="workspace" class="workspace" aria-labelledby="workspace-title" hidden>
+        <div class="workspace-heading">
+          <div>
+            <button id="new-file" class="text-button" type="button">← Open another file</button>
+            <p class="eyebrow">Review desk</p>
+            <h1 id="workspace-title">Untitled subtitle</h1>
+          </div>
+          <button id="export-button" class="primary-button export-button" type="button">Export subtitle <span aria-hidden="true">↓</span></button>
+        </div>
+
+        <div class="integrity-bar" aria-label="Subtitle integrity summary">
+          <div><span class="integrity-dot" aria-hidden="true"></span><strong id="cue-total">0</strong><small>cues preserved</small></div>
+          <div><strong id="approved-total">0 / 0</strong><small>reviewed</small></div>
+          <div><strong id="format-label">SRT</strong><small>source format</small></div>
+          <div><strong>Locked</strong><small>all timestamps</small></div>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-field">
+            <span class="visually-hidden">Search cues</span>
+            <span aria-hidden="true">⌕</span>
+            <input id="cue-search" type="search" placeholder="Search source or target text">
+          </label>
+          <div class="filter-group" aria-label="Filter cues">
+            <button class="filter-button active" type="button" data-filter="all">All</button>
+            <button class="filter-button" type="button" data-filter="pending">Pending</button>
+            <button class="filter-button" type="button" data-filter="approved">Reviewed</button>
+          </div>
+        </div>
+
+        <div class="column-labels" aria-hidden="true">
+          <span>Source / English</span>
+          <span>Target / Sinhala draft</span>
+          <span>Status</span>
+        </div>
+        <div id="cue-list" class="cue-list"></div>
+        <p id="empty-results" class="empty-results" hidden>No cues match this view.</p>
+        <p id="workspace-error" class="error-message workspace-error" role="alert" hidden></p>
+      </section>
+    </main>
+
+    <footer>
+      <span>SinhalaSub · Phase 0</span>
+      <span>Human review required before publication</span>
+    </footer>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

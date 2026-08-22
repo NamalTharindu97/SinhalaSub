@@ -9,5 +9,6 @@
 
 - Run all tests: `python3 -m unittest discover -s experiment/tests -v`.
 - Run one module: `python3 -m unittest experiment.tests.test_subtitles -v`.
+- Start the local GUI: `PYTHONPATH=experiment/src python3 -m sinhalasub.web --open` (defaults to `http://127.0.0.1:8765`).
 - Normalize a file: `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt` (use matching SRT or WebVTT extensions).
 - Test fixtures must be synthetic, commissioned, licensed, or public-domain; record their provenance beside the fixtures.
