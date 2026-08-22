@@ -39,7 +39,7 @@ Do not build the full SaaS before the Phase 0 experiment passes. A technically c
 - Phase 1 Slice 1 is implemented in the local Python harness: SRT/WebVTT integrity, normalized export, tests, and GUI.
 - Phase 1 Slice 2 has provider-neutral context blocks and protected-value contracts, but no live baseline or AI adapter.
 - Phase 1 Slice 3 has deterministic QA, versioned local review reports, reproducible blinded packaging, and confidential rubric/preference aggregation; real frozen system outputs and human evaluator protocol approval remain outstanding.
-- The corpus readiness gate now verifies source-bound independent annotation records and hash-linked adjudication, but the repository contains only a valid three-cue synthetic dry run; the rights-clean 1,500-2,000 cue corpus, private holdout, and real expert annotations have not been created.
+- The corpus workflow now generates source-bound independent annotation templates and neutral-label, hash-linked adjudication templates, and the readiness gate verifies completed records; the repository still contains only a valid three-cue synthetic dry run, so the rights-clean 1,500-2,000 cue corpus, private holdout, and real expert annotations have not been created.
 - Phase 0 discovery, rights-clean corpus creation, legal review, and the controlled experiment remain required before the product gate.
 
 ## Non-Negotiable Invariants

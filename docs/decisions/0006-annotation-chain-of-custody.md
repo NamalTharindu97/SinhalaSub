@@ -17,6 +17,8 @@ Require two versioned record types for every corpus asset:
 
 The corpus audit rejects missing, duplicate, stale, substituted, incomplete, or identity-mismatched records. Canonical record hashes use sorted compact JSON plus one trailing newline; source hashes continue to use normalized serialized subtitle content.
 
+The local annotation workflow command generates one source-bound template per declared annotator. After independent records are complete, it validates every input before generating an adjudication template with neutral candidate labels; annotator IDs are not copied into that template.
+
 These files record experiment evidence, not annotator identity, consent, contracts, or payment details.
 
 ## Consequences

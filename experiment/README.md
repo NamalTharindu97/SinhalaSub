@@ -102,6 +102,24 @@ Without `--allow-not-ready`, the command exits with status 2 until a valid corpu
 
 Every asset must reference at least two `sinhalasub.corpus-annotation.v1` JSON files and one `sinhalasub.corpus-adjudication.v1` JSON file. Annotation records bind the normalized source hash and all challenge cues. The adjudication record must list the canonical SHA-256 of every annotation input, so changing or substituting an annotation invalidates the corpus audit. Checked-in records under `examples/annotations/` are synthetic protocol fixtures only.
 
+Generate a source-bound template separately for each declared annotator:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli annotation \
+  experiment/examples/corpus-manifest.json synthetic-dialogue-sample \
+  synthetic-annotator-1 /tmp/sinhalasub-annotation.json
+```
+
+After all independent records are complete, generate a neutral-label adjudication template. The command rejects incomplete, stale, duplicate, or undeclared annotation inputs:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli adjudication \
+  experiment/examples/corpus-manifest.json synthetic-dialogue-sample \
+  experiment/examples/annotations/synthetic-annotator-1.json \
+  experiment/examples/annotations/synthetic-annotator-2.json \
+  --output /tmp/sinhalasub-adjudication.json
+```
+
 Normalize a subtitle file:
 
 ```sh

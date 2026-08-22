@@ -40,6 +40,8 @@ from .annotations import (
     ADJUDICATION_SCHEMA,
     ANNOTATION_SCHEMA,
     annotation_digest,
+    build_adjudication_template,
+    build_annotation_template,
     validate_adjudication_record,
     validate_annotation_record,
 )
@@ -92,6 +94,8 @@ __all__ = [
     "ADJUDICATION_SCHEMA",
     "ANNOTATION_SCHEMA",
     "annotation_digest",
+    "build_adjudication_template",
+    "build_annotation_template",
     "validate_adjudication_record",
     "validate_annotation_record",
 ]
