@@ -59,6 +59,12 @@ from .system_freeze import (
     audit_system_freeze,
 )
 from .run_capture import RUN_AUDIT_SCHEMA, RUN_SCHEMA, audit_run_capture
+from .decision_gate import (
+    DECISION_AUDIT_SCHEMA,
+    DECISION_EVIDENCE_SCHEMA,
+    DECISION_MANIFEST_SCHEMA,
+    audit_decision,
+)
 
 __all__ = [
     "Cue",
@@ -112,4 +118,8 @@ __all__ = [
     "RUN_AUDIT_SCHEMA",
     "RUN_SCHEMA",
     "audit_run_capture",
+    "DECISION_AUDIT_SCHEMA",
+    "DECISION_EVIDENCE_SCHEMA",
+    "DECISION_MANIFEST_SCHEMA",
+    "audit_decision",
 ]

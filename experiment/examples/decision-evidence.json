@@ -1,0 +1,23 @@
+{
+  "schema_version": "sinhalasub.decision-evidence.v1",
+  "synthetic": true,
+  "run_capture": "run-capture-manifest.json",
+  "run_capture_sha256": "12e0c31d80994f7001954b731c1c38147683032418cece9620a24982d02ccdc4",
+  "translator_count": 3,
+  "viewer_count": 30,
+  "independent_reviewers": ["synthetic-reviewer-1", "synthetic-reviewer-2"],
+  "protocol_approved": true,
+  "analysis_reviewed": true,
+  "metrics": {
+    "cue_integrity_rate": 1.0,
+    "protected_entity_rate": 0.96,
+    "editing_time_reduction": 0.26,
+    "critical_error_reduction": 0.31,
+    "critical_hallucination_rate": 0.004,
+    "systematic_failure": false,
+    "viewer_preference_rate": 0.66,
+    "episode_cost_usd": 2.9,
+    "film_cost_usd": 7.9,
+    "cloud_upload_acceptable": true
+  }
+}

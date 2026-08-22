@@ -147,6 +147,19 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.run_capture_cli \
 
 Each run records a timezone-aware generation time, latency, provider-specific usage unit, USD cost, and output path. The audit verifies complete asset/system coverage and cue/timestamp integrity. Usage totals remain grouped by unit. The synthetic capture is valid protocol evidence but cannot authorize a real experiment.
 
+## Phase 0 Decision Gate
+
+Apply the frozen product thresholds to the hash-bound synthetic evidence record:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.decision_cli \
+  experiment/examples/decision-manifest.json \
+  --output /tmp/sinhalasub-decision-audit.json \
+  --allow-not-authorized
+```
+
+The synthetic evidence intentionally places each metric just beyond the go threshold, but the result remains `not-authorized` because the linked run is not ready and the record is marked synthetic. A real outcome additionally requires at least three translators, 30 viewers, two independent reviewers, approved protocol, reviewed analysis, and a ready corpus/freeze/run chain. Never use the override to claim a real decision.
+
 Normalize a subtitle file:
 
 ```sh
