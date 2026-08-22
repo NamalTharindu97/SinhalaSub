@@ -66,7 +66,7 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli \
   --allow-not-ready-freeze
 ```
 
-The manifest requires an experiment ID, integer seed, source file, provenance, rights basis, an audited system-freeze manifest, and exactly three unique system outputs. Packaging rejects a mismatched source, seed, or system set. All paths are resolved relative to the manifest. The override above accepts only the explicitly synthetic dry-run freeze; omit it for a real experiment.
+The manifest requires an experiment ID, integer seed, source file, provenance, rights basis, an audited system-freeze manifest, a complete system-run capture, and exactly three unique system outputs. Packaging rejects a mismatched source, seed, system set, or captured output hash. All paths are resolved relative to the manifest. The override above accepts only the explicitly synthetic dry-run freeze/capture; omit it for a real experiment.
 
 Give evaluators only the ZIP. The separate key contains the system-freeze ID/hash, system identities, metadata, hashes, seed, and per-block candidate mappings; do not distribute it to evaluators. Re-running identical inputs creates identical package bytes.
 
@@ -133,6 +133,19 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.system_freeze_cli \
 ```
 
 The manifest pins the corpus hash, randomisation seed, rubric, three required system roles, provider/model/adapter versions, instruction hashes, and data-policy review fields. A real freeze requires a ready corpus and `approved` provider policies; `dry_run` records always remain not ready.
+
+## System Run Capture
+
+Audit captured outputs and metering for every frozen system/corpus pair:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.run_capture_cli \
+  experiment/examples/run-capture-manifest.json \
+  --output /tmp/sinhalasub-run-audit.json \
+  --allow-not-ready
+```
+
+Each run records a timezone-aware generation time, latency, provider-specific usage unit, USD cost, and output path. The audit verifies complete asset/system coverage and cue/timestamp integrity. Usage totals remain grouped by unit. The synthetic capture is valid protocol evidence but cannot authorize a real experiment.
 
 Normalize a subtitle file:
 
