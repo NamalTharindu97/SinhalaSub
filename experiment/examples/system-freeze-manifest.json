@@ -1,0 +1,41 @@
+{
+  "schema_version": "sinhalasub.system-freeze.v1",
+  "freeze_id": "synthetic-system-freeze-001",
+  "dry_run": true,
+  "corpus_manifest": "corpus-manifest.json",
+  "corpus_manifest_sha256": "530ddca9042052465d5a20d6d962464238b545bfb94be5300c1b3589c63b0571",
+  "seed": 20260822,
+  "rubric_version": "synthetic-rubric-v1",
+  "systems": [
+    {
+      "id": "synthetic-baseline",
+      "role": "generic-mt",
+      "provider": "local-synthetic",
+      "model": "fixture-a",
+      "model_version": "2026-08-22",
+      "adapter_version": "fixture-v1",
+      "instruction": {"path": "instructions/generic-mt.txt", "version": "v1", "sha256": "502409ead83fd19339adc6f15d5c16c51347e072fa187c2d036bed984d9c9b5c"},
+      "data_policy": {"status": "not-applicable-synthetic", "training_disabled": true, "retention": "none", "region": "local", "reviewed_on": "2026-08-22"}
+    },
+    {
+      "id": "synthetic-line-only",
+      "role": "isolated-llm",
+      "provider": "local-synthetic",
+      "model": "fixture-b",
+      "model_version": "2026-08-22",
+      "adapter_version": "fixture-v1",
+      "instruction": {"path": "instructions/isolated-line.txt", "version": "v1", "sha256": "8c387c8bbf85729b871d1258bf87f3dc3e2d37d66cb4b2d782e15be64f68c87c"},
+      "data_policy": {"status": "not-applicable-synthetic", "training_disabled": true, "retention": "none", "region": "local", "reviewed_on": "2026-08-22"}
+    },
+    {
+      "id": "synthetic-contextual",
+      "role": "contextual-pipeline",
+      "provider": "local-synthetic",
+      "model": "fixture-c",
+      "model_version": "2026-08-22",
+      "adapter_version": "fixture-v1",
+      "instruction": {"path": "instructions/contextual-pipeline.txt", "version": "v1", "sha256": "54bfe58691648b9ee0da0f1d27074af841fdabeb14afbae3ea24f9bac57eb1ee"},
+      "data_policy": {"status": "not-applicable-synthetic", "training_disabled": true, "retention": "none", "region": "local", "reviewed_on": "2026-08-22"}
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Translate each synthetic context block while preserving cue IDs and protected placeholders.
