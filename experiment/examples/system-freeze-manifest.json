@@ -8,7 +8,7 @@
   "rubric_version": "synthetic-rubric-v1",
   "systems": [
     {
-      "id": "synthetic-generic-mt",
+      "id": "synthetic-baseline",
       "role": "generic-mt",
       "provider": "local-synthetic",
       "model": "fixture-a",
@@ -18,7 +18,7 @@
       "data_policy": {"status": "not-applicable-synthetic", "training_disabled": true, "retention": "none", "region": "local", "reviewed_on": "2026-08-22"}
     },
     {
-      "id": "synthetic-isolated-llm",
+      "id": "synthetic-line-only",
       "role": "isolated-llm",
       "provider": "local-synthetic",
       "model": "fixture-b",

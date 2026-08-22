@@ -143,7 +143,7 @@ class ExampleEvaluationTests(unittest.TestCase):
             package_path = root / "evaluators.zip"
             key_path = root / "key.json"
             analysis_path = root / "analysis.json"
-            build_from_manifest(manifest, package_path, key_path)
+            build_from_manifest(manifest, package_path, key_path, allow_not_ready_freeze=True)
 
             analyze_files(package_path, key_path, responses, analysis_path)
 

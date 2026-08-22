@@ -116,7 +116,7 @@ class ExperimentCliTests(unittest.TestCase):
             package_path = Path(directory) / "evaluators.zip"
             key_path = Path(directory) / "confidential-key.json"
 
-            build_from_manifest(manifest, package_path, key_path)
+            build_from_manifest(manifest, package_path, key_path, allow_not_ready_freeze=True)
 
             self.assertTrue(package_path.is_file())
             self.assertTrue(key_path.is_file())
@@ -125,6 +125,37 @@ class ExperimentCliTests(unittest.TestCase):
             key = json.loads(key_path.read_text(encoding="utf-8"))
             self.assertEqual(package["experiment_id"], key["experiment_id"])
             self.assertNotIn("systems", package)
+            self.assertEqual("synthetic-system-freeze-001", key["system_freeze"]["id"])
+            self.assertTrue(key["system_freeze"]["dry_run"])
+
+    def test_rejects_synthetic_freeze_without_explicit_override(self) -> None:
+        manifest = ROOT / "examples" / "blinded-manifest.json"
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "not ready"):
+                build_from_manifest(
+                    manifest,
+                    Path(directory) / "evaluators.zip",
+                    Path(directory) / "key.json",
+                )
+
+    def test_rejects_seed_that_differs_from_freeze(self) -> None:
+        source_manifest = ROOT / "examples" / "blinded-manifest.json"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = json.loads(source_manifest.read_text(encoding="utf-8"))
+            manifest["seed"] += 1
+            manifest["system_freeze"] = str((ROOT / "examples" / manifest["system_freeze"]).resolve())
+            manifest["source"] = str((ROOT / "examples" / manifest["source"]).resolve())
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "seed"):
+                build_from_manifest(
+                    path,
+                    root / "evaluators.zip",
+                    root / "key.json",
+                    allow_not_ready_freeze=True,
+                )
 
 
 if __name__ == "__main__":

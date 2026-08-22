@@ -1,6 +1,7 @@
 {
   "experiment_id": "synthetic-dry-run-001",
   "seed": 20260822,
+  "system_freeze": "system-freeze-manifest.json",
   "source": "../tests/fixtures/sample.srt",
   "provenance": "Fictional SinhalaSub test dialogue created for repository validation on 2026-08-22.",
   "rights_basis": "Repository-authored synthetic fixture; permitted for testing and distribution.",

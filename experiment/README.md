@@ -62,12 +62,13 @@ The example manifest uses only the synthetic repository fixtures:
 PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli \
   experiment/examples/blinded-manifest.json \
   /tmp/sinhalasub-evaluators.zip \
-  --key /tmp/sinhalasub-confidential-key.json
+  --key /tmp/sinhalasub-confidential-key.json \
+  --allow-not-ready-freeze
 ```
 
-The manifest requires an experiment ID, integer seed, source file, provenance, rights basis, and exactly three unique system outputs. All subtitle paths are resolved relative to the manifest.
+The manifest requires an experiment ID, integer seed, source file, provenance, rights basis, an audited system-freeze manifest, and exactly three unique system outputs. Packaging rejects a mismatched source, seed, or system set. All paths are resolved relative to the manifest. The override above accepts only the explicitly synthetic dry-run freeze; omit it for a real experiment.
 
-Give evaluators only the ZIP. The separate key contains system identities, metadata, hashes, seed, and per-block candidate mappings; do not distribute it to evaluators. Re-running identical inputs creates identical package bytes.
+Give evaluators only the ZIP. The separate key contains the system-freeze ID/hash, system identities, metadata, hashes, seed, and per-block candidate mappings; do not distribute it to evaluators. Re-running identical inputs creates identical package bytes.
 
 ## Confidential Evaluation Analysis
 

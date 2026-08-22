@@ -20,7 +20,7 @@ A real freeze is ready only when the corpus readiness audit passes and every pro
 
 - Provider selection remains replaceable and no live SDK is introduced by this decision.
 - Editing the corpus or an instruction artifact invalidates its declared hash and requires an explicit new freeze.
-- Output generation and blinded packaging remain separate steps bound to this frozen configuration.
+- Output generation and blinded packaging remain separate steps; packaging verifies the source, seed, and system IDs against this record and carries its ID/hash in the confidential key.
 - Legal approval is recorded as a gate, not inferred by the tool; the underlying review evidence remains separately controlled.
 
 ## Security, Privacy, Legal, And Cost

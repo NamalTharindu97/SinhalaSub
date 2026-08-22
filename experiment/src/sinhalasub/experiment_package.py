@@ -5,7 +5,7 @@ import hashlib
 import json
 import random
 from pathlib import Path
-from typing import Any, Dict, Mapping, Sequence, Tuple
+from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
 import zipfile
 
 from .subtitles import SubtitleDocument, serialize_subtitle
@@ -40,6 +40,7 @@ def build_blinded_package(
     systems: Sequence[SystemOutput],
     provenance: str,
     rights_basis: str,
+    system_freeze: Optional[Mapping[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     if not experiment_id.strip() or not provenance.strip() or not rights_basis.strip():
         raise ValueError("Experiment ID, provenance, and rights basis are required.")
@@ -132,6 +133,8 @@ def build_blinded_package(
         ],
         "blocks": key_blocks,
     }
+    if system_freeze is not None:
+        key["system_freeze"] = dict(system_freeze)
     return package, key
 
 

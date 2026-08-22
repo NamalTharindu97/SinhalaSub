@@ -18,15 +18,17 @@ Use a local JSON manifest and Python standard-library runner to create two separ
 The runner:
 
 - Requires exactly three unique system outputs.
+- Requires an audited system-freeze record, matching randomisation seed and system IDs, and a source that belongs to the frozen corpus.
 - Requires explicit source provenance and rights basis.
 - Rejects any output that changes format, cue IDs, order, or timestamps.
 - Uses a fixed integer seed and block ID to deterministically shuffle labels separately for every context block.
-- Hashes normalized source/system files and the evaluator package.
+- Hashes normalized source/system files and the evaluator package, and records the system-freeze ID/hash in the confidential key.
 - Writes ZIP metadata deterministically so identical inputs reproduce identical bytes.
 
 ## Consequences
 
 - System outputs are generated before packaging; this runner makes no provider calls.
+- A not-ready freeze is rejected by default. The explicit override accepts only a structurally valid `dry_run` freeze for synthetic protocol testing.
 - Candidate labels are not stable across blocks, reducing simple position bias and accidental unblinding.
 - The confidential key must never be distributed to evaluators or stored inside the ZIP.
 - Different seeds may occasionally produce the same permutation for a block; reproducibility, not guaranteed uniqueness between seeds, is the contract.
