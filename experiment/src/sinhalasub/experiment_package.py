@@ -41,6 +41,7 @@ def build_blinded_package(
     provenance: str,
     rights_basis: str,
     system_freeze: Optional[Mapping[str, Any]] = None,
+    system_run: Optional[Mapping[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     if not experiment_id.strip() or not provenance.strip() or not rights_basis.strip():
         raise ValueError("Experiment ID, provenance, and rights basis are required.")
@@ -135,6 +136,8 @@ def build_blinded_package(
     }
     if system_freeze is not None:
         key["system_freeze"] = dict(system_freeze)
+    if system_run is not None:
+        key["system_run"] = dict(system_run)
     return package, key
 
 

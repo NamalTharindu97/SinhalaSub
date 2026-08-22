@@ -127,6 +127,7 @@ class ExperimentCliTests(unittest.TestCase):
             self.assertNotIn("systems", package)
             self.assertEqual("synthetic-system-freeze-001", key["system_freeze"]["id"])
             self.assertTrue(key["system_freeze"]["dry_run"])
+            self.assertEqual("synthetic-system-run-001", key["system_run"]["id"])
 
     def test_rejects_synthetic_freeze_without_explicit_override(self) -> None:
         manifest = ROOT / "examples" / "blinded-manifest.json"
@@ -150,6 +151,27 @@ class ExperimentCliTests(unittest.TestCase):
             path.write_text(json.dumps(manifest), encoding="utf-8")
 
             with self.assertRaisesRegex(ValueError, "seed"):
+                build_from_manifest(
+                    path,
+                    root / "evaluators.zip",
+                    root / "key.json",
+                    allow_not_ready_freeze=True,
+                )
+
+    def test_rejects_output_substituted_after_run_capture(self) -> None:
+        source_manifest = ROOT / "examples" / "blinded-manifest.json"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = json.loads(source_manifest.read_text(encoding="utf-8"))
+            for field in ("system_freeze", "run_capture", "source"):
+                manifest[field] = str((ROOT / "examples" / manifest[field]).resolve())
+            for system in manifest["systems"]:
+                system["output"] = str((ROOT / "examples" / system["output"]).resolve())
+            manifest["systems"][0]["output"] = manifest["systems"][1]["output"]
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "captured run output"):
                 build_from_manifest(
                     path,
                     root / "evaluators.zip",

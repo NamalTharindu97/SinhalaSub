@@ -1,0 +1,35 @@
+{
+  "schema_version": "sinhalasub.system-run-capture.v1",
+  "run_id": "synthetic-system-run-001",
+  "system_freeze": "system-freeze-manifest.json",
+  "system_freeze_sha256": "6c53de7c2ad962b4bd21f8b539135dc3cdee02247b230569ec947b4a1bbe7fb6",
+  "runs": [
+    {
+      "asset_id": "synthetic-dialogue-sample",
+      "system_id": "synthetic-baseline",
+      "output": "../tests/fixtures/candidate-a.srt",
+      "generated_at": "2026-08-22T10:00:00Z",
+      "duration_ms": 120,
+      "usage": {"input_units": 75, "output_units": 82, "unit": "synthetic-characters"},
+      "cost_usd": 0.0
+    },
+    {
+      "asset_id": "synthetic-dialogue-sample",
+      "system_id": "synthetic-line-only",
+      "output": "../tests/fixtures/candidate-b.srt",
+      "generated_at": "2026-08-22T10:01:00Z",
+      "duration_ms": 180,
+      "usage": {"input_units": 31, "output_units": 44, "unit": "synthetic-tokens"},
+      "cost_usd": 0.0
+    },
+    {
+      "asset_id": "synthetic-dialogue-sample",
+      "system_id": "synthetic-contextual",
+      "output": "../tests/fixtures/candidate-c.srt",
+      "generated_at": "2026-08-22T10:02:00Z",
+      "duration_ms": 240,
+      "usage": {"input_units": 57, "output_units": 46, "unit": "synthetic-tokens"},
+      "cost_usd": 0.0
+    }
+  ]
+}

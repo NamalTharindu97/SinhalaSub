@@ -40,6 +40,7 @@ Do not build the full SaaS before the Phase 0 experiment passes. A technically c
 - Phase 1 Slice 2 has provider-neutral context blocks and protected-value contracts, but no live baseline or AI adapter.
 - Phase 1 Slice 3 has deterministic QA, versioned local review reports, reproducible blinded packaging, and confidential rubric/preference aggregation; real frozen system outputs and human evaluator protocol approval remain outstanding.
 - Provider-neutral system-freeze auditing pins the three experiment roles, corpus/instruction hashes, model and adapter versions, policy review, seed, and rubric; only a synthetic not-ready record exists because no live provider or policy has been approved.
+- System-run auditing requires every frozen system/corpus pair, verifies output structure and hashes, captures latency/usage/cost, and binds blinded packages to those outputs; current evidence remains synthetic and not ready.
 - The corpus workflow now generates source-bound independent annotation templates and neutral-label, hash-linked adjudication templates, and the readiness gate verifies completed records; the repository still contains only a valid three-cue synthetic dry run, so the rights-clean 1,500-2,000 cue corpus, private holdout, and real expert annotations have not been created.
 - Phase 0 discovery, rights-clean corpus creation, legal review, and the controlled experiment remain required before the product gate.
 

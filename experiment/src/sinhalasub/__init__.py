@@ -58,6 +58,7 @@ from .system_freeze import (
     REQUIRED_SYSTEM_ROLES,
     audit_system_freeze,
 )
+from .run_capture import RUN_AUDIT_SCHEMA, RUN_SCHEMA, audit_run_capture
 
 __all__ = [
     "Cue",
@@ -108,4 +109,7 @@ __all__ = [
     "FREEZE_SCHEMA",
     "REQUIRED_SYSTEM_ROLES",
     "audit_system_freeze",
+    "RUN_AUDIT_SCHEMA",
+    "RUN_SCHEMA",
+    "audit_run_capture",
 ]

@@ -9,6 +9,7 @@ from typing import Any, Dict
 
 from .experiment_package import SystemOutput, build_blinded_package, write_blinded_package
 from .corpus import audit_corpus_manifest
+from .run_capture import audit_run_capture
 from .subtitles import SubtitleError, SubtitleFormat, parse_subtitle, serialize_subtitle
 from .system_freeze import audit_system_freeze
 
@@ -55,22 +56,49 @@ def build_from_manifest(
     source_hash = hashlib.sha256(serialize_subtitle(source_document).encode("utf-8")).hexdigest()
     if source_hash not in {asset["source_sha256"] for asset in corpus_audit["assets"]}:
         raise ValueError("Package source does not belong to the frozen corpus.")
-    systems = tuple(
-        SystemOutput(
-            id=str(item["id"]),
-            document=_load_document((root / item["output"]).resolve()),
-            metadata={
-                **dict(item.get("metadata", {})),
-                "role": frozen_by_id[str(item["id"])]["role"],
-                "provider": frozen_by_id[str(item["id"])]["provider"],
-                "model": frozen_by_id[str(item["id"])]["model"],
-                "model_version": frozen_by_id[str(item["id"])]["model_version"],
-                "adapter_version": frozen_by_id[str(item["id"])]["adapter_version"],
-                "instruction_sha256": frozen_by_id[str(item["id"])]["instruction"]["sha256"],
-            },
+
+    run_path = (root / manifest["run_capture"]).resolve()
+    run_audit = audit_run_capture(run_path)
+    if not run_audit["valid"]:
+        raise ValueError("System-run capture is invalid: " + " ".join(run_audit["errors"]))
+    if not run_audit["ready"] and (not allow_not_ready_freeze or not freeze_audit["dry_run"]):
+        raise ValueError("System-run capture is not ready for a real experiment.")
+    if run_audit["system_freeze"]["sha256"] != freeze_audit["manifest_sha256"]:
+        raise ValueError("System-run capture does not match the package system freeze.")
+    captured_by_system = {
+        run["system_id"]: run for run in run_audit["runs"] if run["source_sha256"] == source_hash
+    }
+    if set(captured_by_system) != manifest_ids:
+        raise ValueError("System-run capture does not contain every package system for this source.")
+
+    system_outputs = []
+    for item in manifest["systems"]:
+        system_id = str(item["id"])
+        document = _load_document((root / item["output"]).resolve())
+        output_hash = hashlib.sha256(serialize_subtitle(document).encode("utf-8")).hexdigest()
+        if output_hash != captured_by_system[system_id]["output_sha256"]:
+            raise ValueError(f"System {system_id!r} output does not match the captured run output.")
+        system_outputs.append(
+            SystemOutput(
+                id=system_id,
+                document=document,
+                metadata={
+                    **dict(item.get("metadata", {})),
+                    "role": frozen_by_id[system_id]["role"],
+                    "provider": frozen_by_id[system_id]["provider"],
+                    "model": frozen_by_id[system_id]["model"],
+                    "model_version": frozen_by_id[system_id]["model_version"],
+                    "adapter_version": frozen_by_id[system_id]["adapter_version"],
+                    "instruction_sha256": frozen_by_id[system_id]["instruction"]["sha256"],
+                    "duration_ms": captured_by_system[system_id]["duration_ms"],
+                    "input_units": captured_by_system[system_id]["input_units"],
+                    "output_units": captured_by_system[system_id]["output_units"],
+                    "usage_unit": captured_by_system[system_id]["usage_unit"],
+                    "cost_usd": captured_by_system[system_id]["cost_usd"],
+                },
+            )
         )
-        for item in manifest["systems"]
-    )
+    systems = tuple(system_outputs)
     package, key = build_blinded_package(
         experiment_id=str(manifest["experiment_id"]),
         seed=int(manifest["seed"]),
@@ -82,6 +110,11 @@ def build_from_manifest(
             "id": freeze_audit["freeze_id"],
             "manifest_sha256": freeze_audit["manifest_sha256"],
             "dry_run": freeze_audit["dry_run"],
+        },
+        system_run={
+            "id": run_audit["run_id"],
+            "manifest_sha256": run_audit["manifest_sha256"],
+            "ready": run_audit["ready"],
         },
     )
     write_blinded_package(package, key, package_path, key_path)
