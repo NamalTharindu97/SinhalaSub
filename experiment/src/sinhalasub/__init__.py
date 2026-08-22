@@ -52,6 +52,12 @@ from .corpus import (
     REQUIRED_GENRES,
     audit_corpus_manifest,
 )
+from .system_freeze import (
+    FREEZE_AUDIT_SCHEMA,
+    FREEZE_SCHEMA,
+    REQUIRED_SYSTEM_ROLES,
+    audit_system_freeze,
+)
 
 __all__ = [
     "Cue",
@@ -98,4 +104,8 @@ __all__ = [
     "build_annotation_template",
     "validate_adjudication_record",
     "validate_annotation_record",
+    "FREEZE_AUDIT_SCHEMA",
+    "FREEZE_SCHEMA",
+    "REQUIRED_SYSTEM_ROLES",
+    "audit_system_freeze",
 ]

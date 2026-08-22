@@ -120,6 +120,19 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli adjudication \
   --output /tmp/sinhalasub-adjudication.json
 ```
 
+## System Freeze Audit
+
+Audit the synthetic three-role system freeze without treating it as experiment-ready:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.system_freeze_cli \
+  experiment/examples/system-freeze-manifest.json \
+  --output /tmp/sinhalasub-system-freeze-audit.json \
+  --allow-not-ready
+```
+
+The manifest pins the corpus hash, randomisation seed, rubric, three required system roles, provider/model/adapter versions, instruction hashes, and data-policy review fields. A real freeze requires a ready corpus and `approved` provider policies; `dry_run` records always remain not ready.
+
 Normalize a subtitle file:
 
 ```sh

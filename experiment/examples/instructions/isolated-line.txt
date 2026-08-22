@@ -1,0 +1,1 @@
+Translate each synthetic cue independently while preserving protected placeholders.

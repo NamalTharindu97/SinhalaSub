@@ -1,0 +1,1 @@
+Synthetic dry-run configuration for the generic machine-translation role.
