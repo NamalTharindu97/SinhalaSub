@@ -28,6 +28,13 @@ from .experiment_package import (
     SystemOutput,
     build_blinded_package,
     write_blinded_package,
+    package_digest,
+)
+from .evaluation import (
+    ANALYSIS_SCHEMA,
+    RESPONSE_SCHEMA,
+    RUBRIC_DIMENSIONS,
+    aggregate_evaluator_responses,
 )
 
 __all__ = [
@@ -58,4 +65,9 @@ __all__ = [
     "SystemOutput",
     "build_blinded_package",
     "write_blinded_package",
+    "package_digest",
+    "ANALYSIS_SCHEMA",
+    "RESPONSE_SCHEMA",
+    "RUBRIC_DIMENSIONS",
+    "aggregate_evaluator_responses",
 ]

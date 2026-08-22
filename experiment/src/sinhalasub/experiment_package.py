@@ -14,6 +14,16 @@ from .translation import prepare_document
 
 PACKAGE_SCHEMA = "sinhalasub.blinded-package.v1"
 KEY_SCHEMA = "sinhalasub.blinding-key.v1"
+RUBRIC_DIMENSIONS = (
+    "accuracy",
+    "fluency",
+    "context",
+    "tone_voice",
+    "terminology",
+    "readability",
+    "cultural_appropriateness",
+    "formatting",
+)
 
 
 @dataclass(frozen=True)
@@ -98,10 +108,14 @@ def build_blinded_package(
             "blinded": True,
             "review_complete_blocks": True,
             "candidate_labels_change_by_block": True,
+            "response_schema": "sinhalasub.evaluator-response.v1",
+            "rubric_dimensions": list(RUBRIC_DIMENSIONS),
+            "rubric_score_range": [1, 5],
+            "preference_rule": "Select exactly one preferred candidate per block.",
         },
         "blocks": package_blocks,
     }
-    package_hash = hashlib.sha256(_json_bytes(package)).hexdigest()
+    package_hash = package_digest(package)
     key = {
         "schema_version": KEY_SCHEMA,
         "experiment_id": experiment_id,
@@ -136,6 +150,10 @@ def write_blinded_package(
         entry.external_attr = 0o100644 << 16
         archive.writestr(entry, package_json)
     key_path.write_bytes(_json_bytes(key))
+
+
+def package_digest(package: Mapping[str, Any]) -> str:
+    return hashlib.sha256(_json_bytes(package)).hexdigest()
 
 
 def _structure(document: SubtitleDocument) -> Tuple[Tuple[str, int, int, int], ...]:

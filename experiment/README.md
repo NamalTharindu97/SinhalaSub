@@ -69,6 +69,24 @@ The manifest requires an experiment ID, integer seed, source file, provenance, r
 
 Give evaluators only the ZIP. The separate key contains system identities, metadata, hashes, seed, and per-block candidate mappings; do not distribute it to evaluators. Re-running identical inputs creates identical package bytes.
 
+## Confidential Evaluation Analysis
+
+Evaluator responses use the eight 1-5 rubric dimensions embedded in the package and select exactly one preferred candidate per block. The repository includes three synthetic dry-run responses tied to the example package.
+
+After building the package and key above, validate and aggregate the responses:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli \
+  /tmp/sinhalasub-evaluators.zip \
+  /tmp/sinhalasub-confidential-key.json \
+  experiment/examples/responses/evaluator-1.json \
+  experiment/examples/responses/evaluator-2.json \
+  experiment/examples/responses/evaluator-3.json \
+  --output /tmp/sinhalasub-confidential-analysis.json
+```
+
+The output contains unblinded system-level rubric means, preference rates with 95% Wilson intervals, critical-error totals, and Fleiss' kappa for preference agreement. Keep both the key and analysis confidential until evaluator scoring is locked.
+
 Normalize a subtitle file:
 
 ```sh

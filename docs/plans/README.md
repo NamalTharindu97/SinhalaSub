@@ -38,7 +38,7 @@ Do not build the full SaaS before the Phase 0 experiment passes. A technically c
 
 - Phase 1 Slice 1 is implemented in the local Python harness: SRT/WebVTT integrity, normalized export, tests, and GUI.
 - Phase 1 Slice 2 has provider-neutral context blocks and protected-value contracts, but no live baseline or AI adapter.
-- Phase 1 Slice 3 has deterministic QA, versioned local review reports, and reproducible blinded three-system packaging; real frozen system outputs and evaluator dry-run approval remain outstanding.
+- Phase 1 Slice 3 has deterministic QA, versioned local review reports, reproducible blinded packaging, and confidential rubric/preference aggregation; real frozen system outputs and human evaluator protocol approval remain outstanding.
 - Phase 0 discovery, rights-clean corpus creation, legal review, and the controlled experiment remain required before the product gate.
 
 ## Non-Negotiable Invariants

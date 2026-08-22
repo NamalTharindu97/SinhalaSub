@@ -14,4 +14,5 @@
 - The local GUI is intentionally non-persistent: uploads are parsed in memory, full source paths are unavailable to browser code, reload clears the workspace, and exports go through browser downloads.
 - Normalize a file: `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt` (use matching SRT or WebVTT extensions).
 - Build the synthetic blinded dry run: `PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli experiment/examples/blinded-manifest.json /tmp/sinhalasub-evaluators.zip --key /tmp/sinhalasub-confidential-key.json`. Never distribute the separate key to evaluators.
+- Analyze the three synthetic responses only after building that package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli /tmp/sinhalasub-evaluators.zip /tmp/sinhalasub-confidential-key.json experiment/examples/responses/evaluator-1.json experiment/examples/responses/evaluator-2.json experiment/examples/responses/evaluator-3.json --output /tmp/sinhalasub-confidential-analysis.json`.
 - Test fixtures must be synthetic, commissioned, licensed, or public-domain; record their provenance beside the fixtures.
