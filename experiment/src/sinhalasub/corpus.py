@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Set, Tuple
 
+from .annotations import annotation_digest, validate_adjudication_record, validate_annotation_record
 from .subtitles import SubtitleDocument, SubtitleFormat, parse_subtitle, serialize_subtitle
 
 
@@ -57,7 +58,7 @@ def audit_corpus_manifest(manifest_path: Path) -> Dict[str, Any]:
         assets = []
 
     for position, asset in enumerate(assets, start=1):
-        report, documents = _audit_asset(root, asset, position, errors)
+        report, documents = _audit_asset(root, corpus_id, asset, position, errors)
         asset_reports.append(report)
         asset_id = report["id"]
         if asset_id in seen_ids:
@@ -134,6 +135,7 @@ def audit_corpus_manifest(manifest_path: Path) -> Dict[str, Any]:
 
 def _audit_asset(
     root: Path,
+    corpus_id: str,
     asset: Mapping[str, Any],
     position: int,
     errors: List[str],
@@ -193,6 +195,52 @@ def _audit_asset(
         ):
             errors.append(f"Asset {asset_id!r} source/reference structures do not match.")
 
+    annotation_hashes: Set[str] = set()
+    annotation_paths = asset.get("annotation_files", [])
+    annotation_ids: Set[str] = set()
+    declared_annotators = {str(value).strip() for value in annotators if str(value).strip()} if isinstance(annotators, list) else set()
+    if not isinstance(annotation_paths, list) or len(annotation_paths) < 2:
+        errors.append(f"Asset {asset_id!r} requires at least two independent annotation files.")
+        annotation_paths = []
+    if source_hash:
+        for value in annotation_paths:
+            path = _resolve_path(root, value)
+            record = _load_json_record(path, asset_id, "annotation", errors)
+            if record is None:
+                continue
+            errors.extend(
+                validate_annotation_record(
+                    record,
+                    corpus_id,
+                    asset_id,
+                    source_hash,
+                    asset.get("challenges", []),
+                    declared_annotators,
+                )
+            )
+            annotation_ids.add(str(record.get("annotator_id", "")).strip())
+            annotation_hashes.add(annotation_digest(record))
+        if annotation_ids != declared_annotators or len(annotation_hashes) != len(annotation_paths):
+            errors.append(f"Asset {asset_id!r} annotation files must uniquely cover every declared annotator.")
+
+    adjudication_path_value = asset.get("adjudication_file")
+    adjudication_path = _resolve_path(root, adjudication_path_value)
+    adjudication_record = _load_json_record(adjudication_path, asset_id, "adjudication", errors)
+    adjudication_hash = None
+    if adjudication_record is not None and source_hash:
+        errors.extend(
+            validate_adjudication_record(
+                adjudication_record,
+                corpus_id,
+                asset_id,
+                source_hash,
+                asset.get("challenges", []),
+                str(asset.get("adjudicator", "")).strip(),
+                annotation_hashes,
+            )
+        )
+        adjudication_hash = annotation_digest(adjudication_record)
+
     return (
         {
             "id": asset_id,
@@ -202,8 +250,12 @@ def _audit_asset(
             "challenge_cues": len(asset.get("challenges", [])),
             "source_sha256": source_hash,
             "document_hashes": document_hashes,
+            "annotation_sha256": sorted(annotation_hashes),
+            "adjudication_sha256": adjudication_hash,
             "rights_evidence": str(rights.get("evidence", "")),
             "paths": paths,
+            "annotation_files": [str(value) for value in annotation_paths],
+            "adjudication_file": str(adjudication_path_value or ""),
         },
         (source_document,) if source_document else (),
     )
@@ -213,6 +265,21 @@ def _resolve_path(root: Path, value: Any) -> Any:
     if not isinstance(value, str) or not value.strip():
         return None
     return (root / value).resolve()
+
+
+def _load_json_record(path: Any, asset_id: str, role: str, errors: List[str]) -> Any:
+    if path is None or not path.is_file():
+        errors.append(f"Asset {asset_id!r} {role} file does not exist.")
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        errors.append(f"Asset {asset_id!r} {role} file is invalid: {error}")
+        return None
+    if not isinstance(value, dict):
+        errors.append(f"Asset {asset_id!r} {role} file must contain a JSON object.")
+        return None
+    return value
 
 
 def _load_document(path: Path) -> SubtitleDocument:

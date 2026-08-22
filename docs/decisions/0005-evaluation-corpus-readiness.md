@@ -17,7 +17,7 @@ Every asset records:
 - A unique ID, required genre, and development/private-holdout split.
 - Source, independent reference, and adjudicated-reference subtitle paths with identical cue IDs and timing.
 - Provenance, rights basis, and an existing licence/contributor-agreement evidence file.
-- At least two unique pseudonymous annotator IDs, an adjudicator ID, and confirmation that acceptable alternatives are documented.
+- At least two unique pseudonymous annotator IDs, an adjudicator ID, independent annotation files, and a hash-linked adjudication file as defined by ADR 0006.
 - Explicit confirmation that the reference was authored independently and that holdout assets remain private.
 - Challenge cue IDs and controlled phenomenon tags.
 
@@ -35,7 +35,7 @@ The audit distinguishes `valid` from `ready`. A small synthetic dry run may be v
 
 - Corpus expansion cannot silently lower the experiment thresholds.
 - Normalized source/reference hashes and a canonical manifest hash support freezing and later audit.
-- The tool verifies evidence-file presence and manifest assertions, not the legal sufficiency or authenticity of a licence; counsel and project owners remain responsible for that review.
+- The tool verifies annotation records and evidence-file presence, not the legal sufficiency or authenticity of a licence; counsel and project owners remain responsible for that review.
 - Audit reports retain manifest-relative paths rather than exposing absolute workstation paths.
 
 ## Security, Privacy, Legal, And Cost

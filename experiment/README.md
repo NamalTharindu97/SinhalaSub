@@ -100,6 +100,8 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.corpus_cli \
 
 Without `--allow-not-ready`, the command exits with status 2 until a valid corpus reaches all frozen composition thresholds. Invalid provenance/rights/annotation/structure data always exits with status 1. The audit records relative paths and normalized hashes; it verifies manifest controls but does not replace legal review of rights evidence.
 
+Every asset must reference at least two `sinhalasub.corpus-annotation.v1` JSON files and one `sinhalasub.corpus-adjudication.v1` JSON file. Annotation records bind the normalized source hash and all challenge cues. The adjudication record must list the canonical SHA-256 of every annotation input, so changing or substituting an annotation invalidates the corpus audit. Checked-in records under `examples/annotations/` are synthetic protocol fixtures only.
+
 Normalize a subtitle file:
 
 ```sh

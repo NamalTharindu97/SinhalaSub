@@ -1,0 +1,12 @@
+{
+  "schema_version": "sinhalasub.corpus-annotation.v1",
+  "corpus_id": "synthetic-corpus-dry-run-001",
+  "asset_id": "synthetic-dialogue-sample",
+  "source_sha256": "d21518baea97af5d9f343d5982a37110e53c01f2b1757d247ecaab7e28962766",
+  "annotator_id": "synthetic-annotator-2",
+  "cues": [
+    {"cue_id": "1", "translation": "විල්, සාක්ෂි පෙට්ටිය මෙතනින් තියන්න.", "acceptable_alternatives": ["විල්, සාක්ෂි පෙට්ටිය මෙතන තියලා යන්න."], "tags": ["ambiguous-name", "terminology"], "notes": "Will remains a confirmed name."},
+    {"cue_id": "2", "translation": "මම එහෙම කරන්නේ නැහැ.\nමේක වැදගත්.", "acceptable_alternatives": ["මම ඒක කරන්නේ නෑ.\nමේක වැදගත්."], "tags": ["pronoun", "negation"], "notes": "Preserve the refusal and second sentence."},
+    {"cue_id": "3", "translation": "එකම දේට එයාලා අපෙන් දෙවරක් ගාස්තු ගත්තා.", "acceptable_alternatives": [], "tags": ["terminology"], "notes": "Twice and billing sense are both preserved."}
+  ]
+}

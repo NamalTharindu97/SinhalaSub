@@ -16,6 +16,11 @@
       },
       "annotators": ["synthetic-annotator-1", "synthetic-annotator-2"],
       "adjudicator": "synthetic-adjudicator",
+      "annotation_files": [
+        "annotations/synthetic-annotator-1.json",
+        "annotations/synthetic-annotator-2.json"
+      ],
+      "adjudication_file": "annotations/synthetic-adjudication.json",
       "acceptable_alternatives_documented": true,
       "reference_independently_authored": true,
       "challenges": [

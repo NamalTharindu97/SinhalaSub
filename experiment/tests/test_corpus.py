@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import sys
 import tempfile
@@ -10,8 +11,11 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sinhalasub import (  # noqa: E402
     CORPUS_SCHEMA,
+    ADJUDICATION_SCHEMA,
+    ANNOTATION_SCHEMA,
     REQUIRED_CHALLENGES,
     REQUIRED_GENRES,
+    annotation_digest,
     audit_corpus_manifest,
 )
 
@@ -83,6 +87,10 @@ class CorpusAuditTests(unittest.TestCase):
                     }
                     for index in range(1, 26)
                 ]
+                source_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()
+                annotation_files, adjudication_file = self._write_annotation_records(
+                    root, asset_number, source_hash, challenges
+                )
                 assets.append(
                     {
                         "id": f"asset-{asset_number}",
@@ -95,6 +103,8 @@ class CorpusAuditTests(unittest.TestCase):
                         "rights": {"basis": "Commissioned for evaluation.", "evidence": "RIGHTS.md"},
                         "annotators": ["annotator-a", "annotator-b"],
                         "adjudicator": "adjudicator-c",
+                        "annotation_files": annotation_files,
+                        "adjudication_file": adjudication_file,
                         "acceptable_alternatives_documented": True,
                         "reference_independently_authored": True,
                         "private_holdout": asset_number == 6,
@@ -115,6 +125,59 @@ class CorpusAuditTests(unittest.TestCase):
             self.assertEqual(150, audit["counts"]["challenge_cues"])
             self.assertEqual(6, audit["counts"]["genres"])
             self.assertEqual(2, audit["counts"]["splits"])
+
+    @staticmethod
+    def _write_annotation_records(
+        root: Path,
+        asset_number: int,
+        source_hash: str,
+        challenges: list,
+    ) -> tuple:
+        records = []
+        paths = []
+        for annotator_id in ("annotator-a", "annotator-b"):
+            record = {
+                "schema_version": ANNOTATION_SCHEMA,
+                "corpus_id": "ready",
+                "asset_id": f"asset-{asset_number}",
+                "source_sha256": source_hash,
+                "annotator_id": annotator_id,
+                "cues": [
+                    {
+                        "cue_id": challenge["cue_id"],
+                        "translation": f"Translation {challenge['cue_id']}",
+                        "acceptable_alternatives": [],
+                        "tags": challenge["tags"],
+                        "notes": "Synthetic test annotation.",
+                    }
+                    for challenge in challenges
+                ],
+            }
+            path = f"asset-{asset_number}-{annotator_id}.json"
+            (root / path).write_text(json.dumps(record), encoding="utf-8")
+            paths.append(path)
+            records.append(record)
+        adjudication = {
+            "schema_version": ADJUDICATION_SCHEMA,
+            "corpus_id": "ready",
+            "asset_id": f"asset-{asset_number}",
+            "source_sha256": source_hash,
+            "adjudicator_id": "adjudicator-c",
+            "input_annotation_sha256": [annotation_digest(record) for record in records],
+            "cues": [
+                {
+                    "cue_id": challenge["cue_id"],
+                    "translation": f"Adjudicated {challenge['cue_id']}",
+                    "acceptable_alternatives": [],
+                    "tags": challenge["tags"],
+                    "notes": "Synthetic test adjudication.",
+                }
+                for challenge in challenges
+            ],
+        }
+        adjudication_path = f"asset-{asset_number}-adjudication.json"
+        (root / adjudication_path).write_text(json.dumps(adjudication), encoding="utf-8")
+        return paths, adjudication_path
 
     @staticmethod
     def _subtitle(cue_count: int, prefix: str) -> str:

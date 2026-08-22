@@ -1,0 +1,12 @@
+{
+  "schema_version": "sinhalasub.corpus-annotation.v1",
+  "corpus_id": "synthetic-corpus-dry-run-001",
+  "asset_id": "synthetic-dialogue-sample",
+  "source_sha256": "d21518baea97af5d9f343d5982a37110e53c01f2b1757d247ecaab7e28962766",
+  "annotator_id": "synthetic-annotator-1",
+  "cues": [
+    {"cue_id": "1", "translation": "විල්, සාක්ෂි පෙට්ටිය මෙතන තියලා යන්න.", "acceptable_alternatives": ["විල්, මේ පෙට්ටිය මෙතන තියන්න."], "tags": ["ambiguous-name", "terminology"], "notes": "Will is a person and case is a physical evidence container."},
+    {"cue_id": "2", "translation": "මම ඒක කරන්නේ නෑ.\nමේක වැදගත්.", "acceptable_alternatives": [], "tags": ["pronoun", "negation"], "notes": "Lowercase will is an auxiliary, not the character name."},
+    {"cue_id": "3", "translation": "එයාලා එකම දේට අපෙන් දෙපාරක් ගාස්තු අය කළා.", "acceptable_alternatives": [], "tags": ["terminology"], "notes": "Charged means billed in this cue."}
+  ]
+}

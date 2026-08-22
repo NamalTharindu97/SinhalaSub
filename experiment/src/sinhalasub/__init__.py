@@ -36,6 +36,13 @@ from .evaluation import (
     RUBRIC_DIMENSIONS,
     aggregate_evaluator_responses,
 )
+from .annotations import (
+    ADJUDICATION_SCHEMA,
+    ANNOTATION_SCHEMA,
+    annotation_digest,
+    validate_adjudication_record,
+    validate_annotation_record,
+)
 from .corpus import (
     AUDIT_SCHEMA,
     CORPUS_SCHEMA,
@@ -82,4 +89,9 @@ __all__ = [
     "REQUIRED_CHALLENGES",
     "REQUIRED_GENRES",
     "audit_corpus_manifest",
+    "ADJUDICATION_SCHEMA",
+    "ANNOTATION_SCHEMA",
+    "annotation_digest",
+    "validate_adjudication_record",
+    "validate_annotation_record",
 ]
