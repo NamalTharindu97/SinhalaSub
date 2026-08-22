@@ -22,6 +22,13 @@ from .translation import (
 )
 from .quality import QualityWarning, check_document, grapheme_count
 from .experiment_report import HARNESS_VERSION, REPORT_SCHEMA, build_experiment_report
+from .experiment_package import (
+    KEY_SCHEMA,
+    PACKAGE_SCHEMA,
+    SystemOutput,
+    build_blinded_package,
+    write_blinded_package,
+)
 
 __all__ = [
     "Cue",
@@ -46,4 +53,9 @@ __all__ = [
     "HARNESS_VERSION",
     "REPORT_SCHEMA",
     "build_experiment_report",
+    "KEY_SCHEMA",
+    "PACKAGE_SCHEMA",
+    "SystemOutput",
+    "build_blinded_package",
+    "write_blinded_package",
 ]

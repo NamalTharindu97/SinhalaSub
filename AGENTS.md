@@ -13,4 +13,5 @@
 - Start the local GUI: `PYTHONPATH=experiment/src python3 -m sinhalasub.web --open` (defaults to `http://127.0.0.1:8765`).
 - The local GUI is intentionally non-persistent: uploads are parsed in memory, full source paths are unavailable to browser code, reload clears the workspace, and exports go through browser downloads.
 - Normalize a file: `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt` (use matching SRT or WebVTT extensions).
+- Build the synthetic blinded dry run: `PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli experiment/examples/blinded-manifest.json /tmp/sinhalasub-evaluators.zip --key /tmp/sinhalasub-confidential-key.json`. Never distribute the separate key to evaluators.
 - Test fixtures must be synthetic, commissioned, licensed, or public-domain; record their provenance beside the fixtures.
