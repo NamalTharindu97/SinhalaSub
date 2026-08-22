@@ -1,0 +1,7 @@
+{
+  "schema_version": "sinhalasub.decision-manifest.v1",
+  "decision_id": "synthetic-decision-dry-run-001",
+  "dry_run": true,
+  "evidence": "decision-evidence.json",
+  "evidence_sha256": "ff2d77e8d6817ab778e97d908dcda74e311bc6a5a68e244506cef44ef63ecae0"
+}
