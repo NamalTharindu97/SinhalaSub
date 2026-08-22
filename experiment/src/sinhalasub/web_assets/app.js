@@ -3,6 +3,7 @@ const state = {
   filename: "",
   filter: "all",
   query: "",
+  preparation: null,
 };
 const graphemeSegmenter = "Segmenter" in Intl ? new Intl.Segmenter("si", { granularity: "grapheme" }) : null;
 
@@ -117,6 +118,7 @@ uploadForm.addEventListener("submit", async (event) => {
     state.filename = file.name;
     state.filter = "all";
     state.query = "";
+    state.preparation = null;
     searchInput.value = "";
     document.querySelectorAll(".filter-button").forEach((button) => button.classList.toggle("active", button.dataset.filter === "all"));
     openWorkspace();
@@ -134,6 +136,8 @@ function openWorkspace() {
   document.querySelector("#format-label").textContent = state.document.format === "srt" ? "SRT" : "WebVTT";
   welcome.hidden = true;
   workspace.hidden = false;
+  document.querySelector("#confirmed-names").value = "";
+  document.querySelector("#preparation-status").textContent = "Not prepared yet";
   renderCues();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -186,6 +190,18 @@ function createCueCard(cue) {
     updateProgress();
   });
   targetWrap.append(target, characterCount);
+  const protectedValues = state.preparation?.protected_by_cue?.[cue.id] || [];
+  if (protectedValues.length) {
+    const protectedList = document.createElement("div");
+    protectedList.className = "protected-list";
+    protectedValues.forEach((item) => {
+      const chip = document.createElement("span");
+      chip.className = "protected-chip";
+      chip.textContent = `${item.kind}: ${item.value}`;
+      protectedList.append(chip);
+    });
+    targetWrap.append(protectedList);
+  }
 
   const status = document.createElement("div");
   status.className = "cue-status";
@@ -234,6 +250,32 @@ document.querySelector("#new-file").addEventListener("click", () => {
   welcome.hidden = false;
   clearError(workspaceError);
   window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.querySelector("#prepare-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  clearError(workspaceError);
+  const names = document.querySelector("#confirmed-names").value
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean);
+  const button = event.currentTarget.querySelector("button[type='submit']");
+  const status = document.querySelector("#preparation-status");
+  button.disabled = true;
+  status.textContent = "Preparing context and protected values...";
+  try {
+    state.preparation = await postJson("/api/prepare-translation", {
+      ...state.document,
+      confirmed_names: names,
+    });
+    status.textContent = `${state.preparation.blocks.length} context block${state.preparation.blocks.length === 1 ? "" : "s"} · ${state.preparation.protected_count} protected value${state.preparation.protected_count === 1 ? "" : "s"}`;
+    renderCues();
+  } catch (error) {
+    status.textContent = "Preparation failed";
+    showError(workspaceError, error.message);
+  } finally {
+    button.disabled = false;
+  }
 });
 
 document.querySelector("#export-button").addEventListener("click", async () => {

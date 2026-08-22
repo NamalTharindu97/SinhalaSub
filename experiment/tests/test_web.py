@@ -12,7 +12,12 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from sinhalasub.web import WorkspaceHandler, export_payload, parse_payload  # noqa: E402
+from sinhalasub.web import (  # noqa: E402
+    WorkspaceHandler,
+    export_payload,
+    parse_payload,
+    prepare_translation_payload,
+)
 
 
 SRT = "1\n00:00:01,000 --> 00:00:02,500\nHello there.\n"
@@ -37,6 +42,16 @@ class PayloadTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "EMPTY_CUE"):
             export_payload(payload)
+
+    def test_prepares_context_and_confirmed_names(self) -> None:
+        payload = parse_payload({"format": "srt", "content": SRT.replace("Hello", "Will has 2")})
+        payload["confirmed_names"] = ["Will"]
+
+        prepared = prepare_translation_payload(payload)
+
+        self.assertEqual(1, len(prepared["blocks"]))
+        self.assertEqual(2, prepared["protected_count"])
+        self.assertEqual(("NAME", "NUMBER"), tuple(item["kind"] for item in prepared["protected_by_cue"]["1"]))
 
 
 class ServerTests(unittest.TestCase):
@@ -66,6 +81,14 @@ class ServerTests(unittest.TestCase):
 
         self.assertEqual("srt", result["format"])
         self.assertEqual("Hello there.", result["cues"][0]["target_text"])
+
+    def test_prepare_endpoint_returns_context_blocks(self) -> None:
+        parsed = self._post("/api/parse", {"format": "srt", "content": SRT})
+        parsed["confirmed_names"] = []
+
+        result = self._post("/api/prepare-translation", parsed)
+
+        self.assertEqual(["1"], result["blocks"][0]["cue_ids"])
 
     def test_parse_endpoint_returns_structured_error(self) -> None:
         request = Request(

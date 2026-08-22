@@ -65,6 +65,22 @@
           <div><strong>Locked</strong><small>all timestamps</small></div>
         </div>
 
+        <section class="preparation-panel" aria-labelledby="preparation-title">
+          <div>
+            <p class="eyebrow">Translation preparation</p>
+            <h2 id="preparation-title">Protect the facts before AI.</h2>
+            <p>Confirm character names, then group nearby cues and lock names, numbers, dates, money, and URLs behind placeholders.</p>
+          </div>
+          <form id="prepare-form" class="prepare-form">
+            <label for="confirmed-names">Confirmed names <small>comma separated</small></label>
+            <div class="prepare-controls">
+              <input id="confirmed-names" type="text" placeholder="Will, Rose, Mara">
+              <button class="secondary-button" type="submit">Prepare</button>
+            </div>
+            <p id="preparation-status" class="preparation-status" aria-live="polite">Not prepared yet</p>
+          </form>
+        </section>
+
         <div class="toolbar">
           <label class="search-field">
             <span class="visually-hidden">Search cues</span>

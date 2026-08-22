@@ -10,6 +10,7 @@ from typing import Any, Dict
 import webbrowser
 
 from .subtitles import Cue, SubtitleDocument, SubtitleError, SubtitleFormat, parse_subtitle, serialize_subtitle
+from .translation import prepare_document
 
 
 WEB_ROOT = Path(__file__).with_name("web_assets")
@@ -39,6 +40,37 @@ def parse_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def export_payload(payload: Dict[str, Any]) -> str:
+    document = _document_from_payload(payload, "target_text")
+    return serialize_subtitle(document)
+
+
+def prepare_translation_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    document = _document_from_payload(payload, "text")
+    names = tuple(str(name).strip() for name in payload.get("confirmed_names", []) if str(name).strip())
+    cues, blocks = prepare_document(document, confirmed_names=names)
+    protected_by_cue = {
+        cue.id: [
+            {"placeholder": item.placeholder, "value": item.value, "kind": item.kind}
+            for item in cue.protected_values
+        ]
+        for cue in cues
+    }
+    return {
+        "blocks": [
+            {
+                "id": block.id,
+                "cue_ids": list(block.cue_ids),
+                "context_before": list(block.context_before),
+                "context_after": list(block.context_after),
+            }
+            for block in blocks
+        ],
+        "protected_by_cue": protected_by_cue,
+        "protected_count": sum(len(values) for values in protected_by_cue.values()),
+    }
+
+
+def _document_from_payload(payload: Dict[str, Any], text_field: str) -> SubtitleDocument:
     subtitle_format = SubtitleFormat(payload["format"])
     cues = tuple(
         Cue(
@@ -46,18 +78,17 @@ def export_payload(payload: Dict[str, Any]) -> str:
             index=int(raw["index"]),
             start_ms=int(raw["start_ms"]),
             end_ms=int(raw["end_ms"]),
-            text=str(raw["target_text"]),
+            text=str(raw[text_field]),
             settings=str(raw.get("settings", "")),
         )
         for raw in payload["cues"]
     )
-    document = SubtitleDocument(
+    return SubtitleDocument(
         format=subtitle_format,
         cues=cues,
         header=tuple(str(line) for line in payload.get("header", [])),
         webvtt_description=str(payload.get("webvtt_description", "")),
     )
-    return serialize_subtitle(document)
 
 
 class WorkspaceHandler(BaseHTTPRequestHandler):
@@ -88,6 +119,7 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         routes = {
             "/api/parse": parse_payload,
+            "/api/prepare-translation": prepare_translation_payload,
             "/api/export": export_payload,
         }
         action = routes.get(self.path)

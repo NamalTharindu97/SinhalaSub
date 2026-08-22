@@ -1,6 +1,6 @@
 # Phase 0 Experiment Harness
 
-This package provides the subtitle integrity foundation for the controlled English-to-Sinhala translation experiment. It currently parses and normalizes SRT/WebVTT files without changing cue timing.
+This package provides the subtitle integrity foundation for the controlled English-to-Sinhala translation experiment. It parses and normalizes SRT/WebVTT files, prepares bounded context blocks, and protects confirmed names and factual values without changing cue timing.
 
 ## Requirements
 
@@ -27,7 +27,9 @@ Start the local review workspace:
 PYTHONPATH=experiment/src python3 -m sinhalasub.web --open
 ```
 
-Then open `http://127.0.0.1:8765`. The workspace accepts an SRT/WebVTT file, keeps timing locked, lets you edit target text, and exports a reviewed copy. It runs locally and does not translate text with AI yet.
+Then open `http://127.0.0.1:8765`. The workspace accepts an SRT/WebVTT file, keeps timing locked, prepares context/protected values, lets you edit target text, and exports a reviewed copy. It runs locally and does not translate text with AI yet.
+
+The preparation step accepts comma-separated confirmed character names. It also protects detected numbers, dates, currencies, and URLs. The repository currently includes only an echo provider for contract testing; no live AI provider is configured.
 
 Normalize a subtitle file:
 
