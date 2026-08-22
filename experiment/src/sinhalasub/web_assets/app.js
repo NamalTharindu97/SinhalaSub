@@ -4,6 +4,7 @@ const state = {
   filter: "all",
   query: "",
   preparation: null,
+  quality: null,
 };
 const graphemeSegmenter = "Segmenter" in Intl ? new Intl.Segmenter("si", { granularity: "grapheme" }) : null;
 
@@ -119,6 +120,7 @@ uploadForm.addEventListener("submit", async (event) => {
     state.filter = "all";
     state.query = "";
     state.preparation = null;
+    state.quality = null;
     searchInput.value = "";
     document.querySelectorAll(".filter-button").forEach((button) => button.classList.toggle("active", button.dataset.filter === "all"));
     openWorkspace();
@@ -132,12 +134,14 @@ uploadForm.addEventListener("submit", async (event) => {
 
 function openWorkspace() {
   document.querySelector("#workspace-title").textContent = state.filename;
+  document.querySelector("#source-file-name").textContent = state.filename;
   document.querySelector("#cue-total").textContent = state.document.cues.length;
   document.querySelector("#format-label").textContent = state.document.format === "srt" ? "SRT" : "WebVTT";
   welcome.hidden = true;
   workspace.hidden = false;
   document.querySelector("#confirmed-names").value = "";
   document.querySelector("#preparation-status").textContent = "Not prepared yet";
+  updateQaSummary();
   renderCues();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -184,10 +188,13 @@ function createCueCard(cue) {
   target.addEventListener("input", () => {
     cue.target_text = target.value;
     cue.approved = false;
+    state.quality = null;
+    targetWrap.querySelector(".warning-list")?.remove();
     characterCount.textContent = `${graphemeCount(target.value)} graphemes`;
     card.classList.remove("reviewed");
     checkbox.checked = false;
     updateProgress();
+    updateQaSummary();
   });
   targetWrap.append(target, characterCount);
   const protectedValues = state.preparation?.protected_by_cue?.[cue.id] || [];
@@ -201,6 +208,18 @@ function createCueCard(cue) {
       protectedList.append(chip);
     });
     targetWrap.append(protectedList);
+  }
+  const qualityWarnings = state.quality?.warnings_by_cue?.[cue.id] || [];
+  if (qualityWarnings.length) {
+    const warningList = document.createElement("div");
+    warningList.className = "warning-list";
+    qualityWarnings.forEach((warning) => {
+      const chip = document.createElement("div");
+      chip.className = `warning-chip ${warning.severity}`;
+      chip.textContent = `${warning.code.replaceAll("_", " ")} · ${warning.message}`;
+      warningList.append(chip);
+    });
+    targetWrap.append(warningList);
   }
 
   const status = document.createElement("div");
@@ -227,6 +246,20 @@ function createCueCard(cue) {
 function updateProgress() {
   const approved = state.document.cues.filter((cue) => cue.approved).length;
   document.querySelector("#approved-total").textContent = `${approved} / ${state.document.cues.length}`;
+}
+
+function updateQaSummary() {
+  const summary = document.querySelector("#qa-summary");
+  if (!state.quality) {
+    summary.textContent = "QA has not been run on this draft.";
+    summary.classList.remove("has-warnings");
+    return;
+  }
+  const counts = state.quality.counts;
+  summary.textContent = state.quality.total
+    ? `${state.quality.total} warning${state.quality.total === 1 ? "" : "s"}: ${counts.high} high · ${counts.medium} medium · ${counts.low} low`
+    : "QA passed with no readability or source-timing warnings.";
+  summary.classList.toggle("has-warnings", state.quality.total > 0);
 }
 
 searchInput.addEventListener("input", () => {
@@ -275,6 +308,23 @@ document.querySelector("#prepare-form").addEventListener("submit", async (event)
     showError(workspaceError, error.message);
   } finally {
     button.disabled = false;
+  }
+});
+
+document.querySelector("#qa-button").addEventListener("click", async () => {
+  clearError(workspaceError);
+  const button = document.querySelector("#qa-button");
+  button.disabled = true;
+  button.textContent = "Checking...";
+  try {
+    state.quality = await postJson("/api/qa", state.document);
+    renderCues();
+    updateQaSummary();
+  } catch (error) {
+    showError(workspaceError, error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Run QA";
   }
 });
 

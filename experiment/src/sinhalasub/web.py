@@ -11,6 +11,7 @@ import webbrowser
 
 from .subtitles import Cue, SubtitleDocument, SubtitleError, SubtitleFormat, parse_subtitle, serialize_subtitle
 from .translation import prepare_document
+from .quality import check_document
 
 
 WEB_ROOT = Path(__file__).with_name("web_assets")
@@ -70,6 +71,18 @@ def prepare_translation_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def quality_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    warnings = check_document(_document_from_payload(payload, "target_text"))
+    by_cue: Dict[str, Any] = {}
+    counts = {"high": 0, "medium": 0, "low": 0}
+    for warning in warnings:
+        by_cue.setdefault(warning.cue_id, []).append(
+            {"code": warning.code, "severity": warning.severity, "message": warning.message}
+        )
+        counts[warning.severity] += 1
+    return {"warnings_by_cue": by_cue, "counts": counts, "total": len(warnings)}
+
+
 def _document_from_payload(payload: Dict[str, Any], text_field: str) -> SubtitleDocument:
     subtitle_format = SubtitleFormat(payload["format"])
     cues = tuple(
@@ -120,6 +133,7 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
         routes = {
             "/api/parse": parse_payload,
             "/api/prepare-translation": prepare_translation_payload,
+            "/api/qa": quality_payload,
             "/api/export": export_payload,
         }
         action = routes.get(self.path)

@@ -17,6 +17,7 @@ from sinhalasub.web import (  # noqa: E402
     export_payload,
     parse_payload,
     prepare_translation_payload,
+    quality_payload,
 )
 
 
@@ -52,6 +53,15 @@ class PayloadTests(unittest.TestCase):
         self.assertEqual(1, len(prepared["blocks"]))
         self.assertEqual(2, prepared["protected_count"])
         self.assertEqual(("NAME", "NUMBER"), tuple(item["kind"] for item in prepared["protected_by_cue"]["1"]))
+
+    def test_returns_quality_warnings_for_dense_target(self) -> None:
+        payload = parse_payload({"format": "srt", "content": SRT})
+        payload["cues"][0]["target_text"] = "A" * 60
+
+        result = quality_payload(payload)
+
+        self.assertGreater(result["total"], 0)
+        self.assertIn("1", result["warnings_by_cue"])
 
 
 class ServerTests(unittest.TestCase):
@@ -89,6 +99,14 @@ class ServerTests(unittest.TestCase):
         result = self._post("/api/prepare-translation", parsed)
 
         self.assertEqual(["1"], result["blocks"][0]["cue_ids"])
+
+    def test_qa_endpoint_returns_warning_counts(self) -> None:
+        parsed = self._post("/api/parse", {"format": "srt", "content": SRT})
+        parsed["cues"][0]["target_text"] = "A" * 60
+
+        result = self._post("/api/qa", parsed)
+
+        self.assertGreater(result["counts"]["high"], 0)
 
     def test_parse_endpoint_returns_structured_error(self) -> None:
         request = Request(

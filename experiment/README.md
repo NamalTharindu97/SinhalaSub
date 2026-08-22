@@ -31,6 +31,17 @@ Then open `http://127.0.0.1:8765`. The workspace accepts an SRT/WebVTT file, kee
 
 The preparation step accepts comma-separated confirmed character names. It also protects detected numbers, dates, currencies, and URLs. The repository currently includes only an echo provider for contract testing; no live AI provider is configured.
 
+## Local File Handling
+
+- The browser exposes the selected filename, not its full original path; this is a browser security restriction.
+- The GUI reads subtitle text into browser/server request memory and does not save an uploaded source file on the server filesystem.
+- Closing or reloading the page clears the current workspace.
+- Exported files are downloaded through the browser, normally into the browser's configured Downloads folder.
+
+## Deterministic QA
+
+`Run QA` checks the current target text for the pilot defaults: two lines, a soft 40 graphemes per line, 17 graphemes per second, 1-7 second duration, and source cue overlap. These checks create warnings only and never modify source timing.
+
 Normalize a subtitle file:
 
 ```sh

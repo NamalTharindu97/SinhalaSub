@@ -20,6 +20,7 @@ from .translation import (
     restore_text,
     run_translation,
 )
+from .quality import QualityWarning, check_document, grapheme_count
 
 __all__ = [
     "Cue",
@@ -38,4 +39,7 @@ __all__ = [
     "protect_text",
     "restore_text",
     "run_translation",
+    "QualityWarning",
+    "check_document",
+    "grapheme_count",
 ]

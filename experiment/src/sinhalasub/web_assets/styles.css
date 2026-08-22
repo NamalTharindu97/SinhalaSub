@@ -195,6 +195,7 @@ main { min-height: calc(100vh - 136px); }
   color: var(--muted);
   font-size: 13px;
 }
+.path-note { margin: -5px 0 17px; color: var(--muted); font-size: 11px; line-height: 1.45; }
 
 .primary-button {
   border: 0;
@@ -244,6 +245,24 @@ main { min-height: calc(100vh - 136px); }
 .text-button { margin: 0 0 25px; padding: 0; border: 0; color: var(--muted); background: none; cursor: pointer; }
 .text-button:hover { color: var(--red); }
 .export-button { min-width: 220px; }
+.workspace-actions { display: flex; gap: 10px; }
+.outline-button { min-height: 52px; padding: 0 22px; border: 1px solid var(--ink); background: transparent; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.outline-button:hover { color: white; background: var(--ink); }
+.outline-button:disabled { opacity: 0.55; cursor: wait; }
+
+.file-handling {
+  margin-top: 30px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.72);
+}
+.file-handling div { min-width: 0; }
+.file-handling small, .file-handling strong { display: block; }
+.file-handling small { margin-bottom: 5px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.file-handling strong { overflow: hidden; font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 
 .integrity-bar {
   margin: 35px 0 22px;
@@ -313,6 +332,8 @@ main { min-height: calc(100vh - 136px); }
 .filter-group { display: flex; gap: 6px; }
 .filter-button { padding: 9px 14px; border: 1px solid transparent; background: transparent; color: var(--muted); cursor: pointer; }
 .filter-button.active { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+.qa-summary { margin: -12px 0 22px; color: var(--muted); font-size: 12px; }
+.qa-summary.has-warnings { color: var(--red-dark); }
 
 .column-labels {
   padding: 0 22px 10px 102px;
@@ -351,6 +372,10 @@ main { min-height: calc(100vh - 136px); }
 .char-count { color: var(--muted); font-size: 10px; }
 .protected-list { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 5px; }
 .protected-chip { padding: 3px 7px; border: 1px solid #d8b870; color: #775923; background: #fff6de; font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.warning-list { margin-top: 9px; display: grid; gap: 5px; }
+.warning-chip { padding: 6px 8px; border-left: 3px solid var(--gold); color: #654c22; background: #fff3d8; font-size: 10px; line-height: 1.35; }
+.warning-chip.high { border-color: var(--red); color: var(--red-dark); background: #f8e9e5; }
+.warning-chip.low { border-color: #8d877d; color: var(--muted); background: #f1eee8; }
 .empty-results { padding: 70px 20px; text-align: center; color: var(--muted); border: 1px dashed var(--line); }
 .workspace-error { margin-top: 20px; }
 
@@ -378,6 +403,7 @@ footer {
   .integrity-bar > div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
   .column-labels { display: none; }
   .preparation-panel { grid-template-columns: 1fr; gap: 24px; }
+  .file-handling { grid-template-columns: repeat(2, 1fr); }
   .cue-card { grid-template-columns: 48px 1fr 82px; }
   .cue-source, .cue-target { grid-column: 2 / 4; }
   .cue-status { grid-column: 3; grid-row: 1; }
@@ -392,10 +418,13 @@ footer {
   .drop-zone { min-height: 220px; padding: 24px 12px; }
   .workspace { padding-top: 28px; }
   .workspace-heading { align-items: stretch; flex-direction: column; }
+  .workspace-actions { flex-direction: column; }
+  .workspace-actions button { width: 100%; }
   .export-button { width: 100%; }
   .integrity-bar > div { padding: 14px; }
   .prepare-controls { align-items: stretch; flex-direction: column; gap: 8px; }
   .prepare-controls input { border-right: 1px solid #635d55; }
+  .file-handling { grid-template-columns: 1fr; }
   .toolbar { align-items: stretch; flex-direction: column; }
   .search-field { min-width: 100%; }
   .filter-group { overflow-x: auto; }

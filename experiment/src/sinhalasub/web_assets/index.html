@@ -43,6 +43,7 @@
           </label>
           <input id="subtitle-file" type="file" accept=".srt,.vtt,.webvtt" required>
           <div id="file-choice" class="file-choice" aria-live="polite">No file selected</div>
+          <p class="path-note">Your browser hides the original full file path for security. SinhalaSub reads the file in memory and does not copy it into project storage.</p>
           <button class="primary-button" type="submit">Open workspace <span aria-hidden="true">→</span></button>
           <p id="upload-error" class="error-message" role="alert" hidden></p>
         </form>
@@ -55,8 +56,18 @@
             <p class="eyebrow">Review desk</p>
             <h1 id="workspace-title">Untitled subtitle</h1>
           </div>
-          <button id="export-button" class="primary-button export-button" type="button">Export subtitle <span aria-hidden="true">↓</span></button>
+          <div class="workspace-actions">
+            <button id="qa-button" class="outline-button" type="button">Run QA</button>
+            <button id="export-button" class="primary-button export-button" type="button">Export subtitle <span aria-hidden="true">↓</span></button>
+          </div>
         </div>
+
+        <aside class="file-handling" aria-label="File handling">
+          <div><small>Source file</small><strong id="source-file-name">—</strong></div>
+          <div><small>Current storage</small><strong>Memory only · no server file</strong></div>
+          <div><small>Export location</small><strong>Browser Downloads folder</strong></div>
+          <div><small>Full source path</small><strong>Hidden by browser security</strong></div>
+        </aside>
 
         <div class="integrity-bar" aria-label="Subtitle integrity summary">
           <div><span class="integrity-dot" aria-hidden="true"></span><strong id="cue-total">0</strong><small>cues preserved</small></div>
@@ -93,6 +104,7 @@
             <button class="filter-button" type="button" data-filter="approved">Reviewed</button>
           </div>
         </div>
+        <div id="qa-summary" class="qa-summary" aria-live="polite">QA has not been run on this draft.</div>
 
         <div class="column-labels" aria-hidden="true">
           <span>Source / English</span>
