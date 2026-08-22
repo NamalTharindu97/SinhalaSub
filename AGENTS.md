@@ -1,6 +1,13 @@
 # Repository Status
 
-- The repository contains planning only: product research is in `docs/AI_Powered_English_to_Sinhala_Subtitle_Research_Report.docx`, and the executable delivery plan starts at `docs/plans/README.md`.
-- No application entrypoint, manifest, lockfile, developer commands, CI, or toolchain exists yet. Next.js/FastAPI/PostgreSQL/Redis in the plan are candidates requiring ADRs, not installed choices.
+- Product research is in `docs/AI_Powered_English_to_Sinhala_Subtitle_Research_Report.docx`; the delivery plan starts at `docs/plans/README.md`.
+- The only implementation is the Python 3.9+ standard-library Phase 0 harness under `experiment/`; its decision and limits are in `docs/decisions/0001-experiment-tool-shape.md`. Next.js/FastAPI/PostgreSQL/Redis remain unapproved production candidates.
 - Execute Phase 0 validation and the controlled translation experiment before building the full SaaS; the go/no-go thresholds and pivot outcomes are in `docs/plans/02-validation-plan.md`.
 - The MVP is private, authorised-use, subtitle-only, and human-in-the-loop. Preserve cue IDs/count/timestamps, keep global training off by default, and do not add video upload, public subtitle distribution, unlicensed scraping, or unlicensed training data.
+
+# Experiment Commands
+
+- Run all tests: `python3 -m unittest discover -s experiment/tests -v`.
+- Run one module: `python3 -m unittest experiment.tests.test_subtitles -v`.
+- Normalize a file: `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt` (use matching SRT or WebVTT extensions).
+- Test fixtures must be synthetic, commissioned, licensed, or public-domain; record their provenance beside the fixtures.

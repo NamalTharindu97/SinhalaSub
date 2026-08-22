@@ -1,0 +1,12 @@
+1
+00:00:01,250 --> 00:00:03,500
+Will, leave the case here.
+
+2
+00:00:04,000 --> 00:00:06,750
+I will not.
+This is important.
+
+3
+01:02:03,004 --> 01:02:05,120
+They charged us twice.
