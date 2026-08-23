@@ -189,7 +189,9 @@ function openWorkspace() {
   document.querySelector("#format-label").textContent = state.document.format === "srt" ? "SRT" : "WebVTT";
   welcome.hidden = true;
   workspace.hidden = false;
-  document.querySelector("#confirmed-names").value = "";
+  document.querySelector("#characters").value = "";
+  document.querySelector("#glossary").value = "";
+  document.querySelector("#dialogue-style").value = "conversational";
   document.querySelector("#preparation-status").textContent = "Not prepared yet";
   updateQaSummary();
   renderCues();
@@ -349,20 +351,32 @@ document.querySelector("#new-file").addEventListener("click", () => {
 document.querySelector("#prepare-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   clearError(workspaceError);
-  const names = document.querySelector("#confirmed-names").value
-    .split(",")
-    .map((name) => name.trim())
-    .filter(Boolean);
   const button = event.currentTarget.querySelector("button[type='submit']");
   const status = document.querySelector("#preparation-status");
   button.disabled = true;
   status.textContent = "Preparing context and protected values...";
   try {
+    const characters = document.querySelector("#characters").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+      const [name, aliasesText = ""] = line.split("|", 2).map((part) => part.trim());
+      if (!name) throw new Error("Each character line requires a name.");
+      return { name, aliases: aliasesText.split(",").map((alias) => alias.trim()).filter(Boolean) };
+    });
+    const glossary = document.querySelector("#glossary").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+      const separator = line.indexOf("=");
+      if (separator < 1 || !line.slice(separator + 1).trim()) throw new Error("Each glossary line must use source = Sinhala target.");
+      return { source: line.slice(0, separator).trim(), target: line.slice(separator + 1).trim() };
+    });
     state.preparation = await postJson("/api/prepare-translation", {
       ...state.document,
-      confirmed_names: names,
+      project_context: {
+        schema_version: "sinhalasub.project-context.v1",
+        style: document.querySelector("#dialogue-style").value,
+        characters,
+        glossary,
+      },
     });
-    status.textContent = `${state.preparation.blocks.length} context block${state.preparation.blocks.length === 1 ? "" : "s"} · ${state.preparation.protected_count} protected value${state.preparation.protected_count === 1 ? "" : "s"}`;
+    const profile = state.preparation.profile;
+    status.textContent = `${state.preparation.blocks.length} blocks · ${state.preparation.protected_count} protected · ${profile.character_term_count} names/aliases · ${profile.glossary_term_count} terms · ${profile.style}`;
     renderCues();
   } catch (error) {
     status.textContent = "Preparation failed";

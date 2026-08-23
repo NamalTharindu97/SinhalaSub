@@ -65,6 +65,13 @@ from .decision_gate import (
     DECISION_MANIFEST_SCHEMA,
     audit_decision,
 )
+from .project_context import (
+    PROJECT_CONTEXT_SCHEMA,
+    Character,
+    GlossaryEntry,
+    ProjectContext,
+    parse_project_context,
+)
 
 __all__ = [
     "Cue",
@@ -122,4 +129,9 @@ __all__ = [
     "DECISION_EVIDENCE_SCHEMA",
     "DECISION_MANIFEST_SCHEMA",
     "audit_decision",
+    "PROJECT_CONTEXT_SCHEMA",
+    "Character",
+    "GlossaryEntry",
+    "ProjectContext",
+    "parse_project_context",
 ]

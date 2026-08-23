@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 import re
-from typing import Iterable, List, Protocol, Sequence, Tuple
+from typing import Iterable, List, Mapping, Optional, Protocol, Sequence, Tuple
 
 from .subtitles import Cue, SubtitleDocument, SubtitleError
 
@@ -75,13 +75,21 @@ _BASE_PATTERNS = (
 )
 
 
-def protect_text(text: str, confirmed_names: Iterable[str] = ()) -> Tuple[str, Tuple[ProtectedValue, ...]]:
+def protect_text(
+    text: str,
+    confirmed_names: Iterable[str] = (),
+    glossary: Optional[Mapping[str, str]] = None,
+) -> Tuple[str, Tuple[ProtectedValue, ...]]:
     matches: List[Tuple[int, int, str, str]] = []
     names = sorted({name.strip() for name in confirmed_names if name.strip()}, key=len, reverse=True)
     if names:
         names_pattern = "|".join(re.escape(name) for name in names)
         for match in re.finditer(rf"(?<!\w)(?:{names_pattern})(?!\w)", text):
             matches.append((match.start(), match.end(), "NAME", match.group(0)))
+
+    for source, target in sorted((glossary or {}).items(), key=lambda item: len(item[0]), reverse=True):
+        for match in re.finditer(rf"(?<!\w){re.escape(source)}(?!\w)", text):
+            matches.append((match.start(), match.end(), "TERM", target))
 
     for kind, pattern in _BASE_PATTERNS:
         for match in re.finditer(pattern, text):
@@ -123,6 +131,7 @@ def restore_text(text: str, protected_values: Sequence[ProtectedValue]) -> str:
 def prepare_document(
     document: SubtitleDocument,
     confirmed_names: Iterable[str] = (),
+    glossary: Optional[Mapping[str, str]] = None,
     max_cues_per_block: int = 8,
     max_gap_ms: int = 6000,
     context_cues: int = 2,
@@ -131,7 +140,7 @@ def prepare_document(
         raise ValueError("Context grouping limits must be non-negative and max cues must be positive.")
 
     confirmed_names = tuple(confirmed_names)
-    prepared = tuple(_prepare_cue(cue, confirmed_names) for cue in document.cues)
+    prepared = tuple(_prepare_cue(cue, confirmed_names, glossary or {}) for cue in document.cues)
     groups: List[List[PreparedCue]] = []
     current: List[PreparedCue] = []
     for cue in prepared:
@@ -164,12 +173,15 @@ def run_translation(
     prepared_cues: Sequence[PreparedCue],
     blocks: Sequence[ContextBlock],
     provider: TranslationProvider,
+    style: str = "conversational",
 ) -> Tuple[TranslationCandidate, ...]:
+    if not style.strip():
+        raise ValueError("Translation style is required.")
     cues_by_id = {cue.id: cue for cue in prepared_cues}
     results: List[TranslationCandidate] = []
     for block in blocks:
         request_cues = tuple(cues_by_id[cue_id] for cue_id in block.cue_ids)
-        candidates = tuple(provider.translate(TranslationRequest(block=block, cues=request_cues)))
+        candidates = tuple(provider.translate(TranslationRequest(block=block, cues=request_cues, style=style)))
         expected_ids = tuple(block.cue_ids)
         observed_ids = tuple(candidate.cue_id for candidate in candidates)
         if observed_ids != expected_ids:
@@ -189,8 +201,8 @@ def run_translation(
     return tuple(results)
 
 
-def _prepare_cue(cue: Cue, confirmed_names: Iterable[str]) -> PreparedCue:
-    protected_text, protected_values = protect_text(cue.text, confirmed_names)
+def _prepare_cue(cue: Cue, confirmed_names: Iterable[str], glossary: Mapping[str, str]) -> PreparedCue:
+    protected_text, protected_values = protect_text(cue.text, confirmed_names, glossary)
     return PreparedCue(
         id=cue.id,
         index=cue.index,

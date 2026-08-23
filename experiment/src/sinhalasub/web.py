@@ -13,6 +13,7 @@ from .subtitles import Cue, SubtitleDocument, SubtitleError, SubtitleFormat, par
 from .translation import prepare_document
 from .quality import check_document
 from .experiment_report import build_experiment_report
+from .project_context import parse_project_context
 
 
 WEB_ROOT = Path(__file__).with_name("web_assets")
@@ -48,8 +49,16 @@ def export_payload(payload: Dict[str, Any]) -> str:
 
 def prepare_translation_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     document = _document_from_payload(payload, "text")
-    names = tuple(str(name).strip() for name in payload.get("confirmed_names", []) if str(name).strip())
-    cues, blocks = prepare_document(document, confirmed_names=names)
+    if "project_context" in payload:
+        context = parse_project_context(payload["project_context"])
+        names = context.names_and_aliases
+        glossary = context.glossary_map
+        style = context.style
+    else:
+        names = tuple(str(name).strip() for name in payload.get("confirmed_names", []) if str(name).strip())
+        glossary = {}
+        style = "conversational"
+    cues, blocks = prepare_document(document, confirmed_names=names, glossary=glossary)
     protected_by_cue = {
         cue.id: [
             {"placeholder": item.placeholder, "value": item.value, "kind": item.kind}
@@ -69,6 +78,11 @@ def prepare_translation_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
         ],
         "protected_by_cue": protected_by_cue,
         "protected_count": sum(len(values) for values in protected_by_cue.values()),
+        "profile": {
+            "style": style,
+            "character_term_count": len(names),
+            "glossary_term_count": len(glossary),
+        },
     }
 
 

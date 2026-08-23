@@ -82,14 +82,26 @@
           <div>
             <p class="eyebrow">Translation preparation</p>
             <h2 id="preparation-title">Protect the facts before AI.</h2>
-            <p>Confirm character names, then group nearby cues and lock names, numbers, dates, money, and URLs behind placeholders.</p>
+            <p>Set character aliases, approved Sinhala terms, and style before grouping cues and locking protected values.</p>
           </div>
           <form id="prepare-form" class="prepare-form">
-            <label for="confirmed-names">Confirmed names <small>comma separated</small></label>
-            <div class="prepare-controls">
-              <input id="confirmed-names" type="text" placeholder="Will, Rose, Mara">
-              <button class="secondary-button" type="submit">Prepare</button>
+            <div class="profile-fields">
+              <label>Characters and aliases <small>one per line: name | aliases</small>
+                <textarea id="characters" rows="3" placeholder="Will | William, Detective Will&#10;Rose"></textarea>
+              </label>
+              <label>Approved glossary <small>one per line: source = Sinhala target</small>
+                <textarea id="glossary" rows="3" placeholder="evidence = සාක්ෂි&#10;case file = නඩු ගොනුව"></textarea>
+              </label>
+              <label>Dialogue style
+                <select id="dialogue-style">
+                  <option value="conversational">Conversational</option>
+                  <option value="formal">Formal</option>
+                  <option value="technical">Technical</option>
+                  <option value="youth-casual">Youth / casual</option>
+                </select>
+              </label>
             </div>
+            <button class="secondary-button" type="submit">Prepare context</button>
             <p id="preparation-status" class="preparation-status" aria-live="polite">Not prepared yet</p>
           </form>
         </section>

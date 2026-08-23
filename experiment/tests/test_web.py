@@ -55,6 +55,20 @@ class PayloadTests(unittest.TestCase):
         self.assertEqual(2, prepared["protected_count"])
         self.assertEqual(("NAME", "NUMBER"), tuple(item["kind"] for item in prepared["protected_by_cue"]["1"]))
 
+    def test_prepares_versioned_project_context(self) -> None:
+        payload = parse_payload({"format": "srt", "content": SRT.replace("Hello there", "Detective Will opened the case file")})
+        payload["project_context"] = {
+            "schema_version": "sinhalasub.project-context.v1",
+            "style": "formal",
+            "characters": [{"name": "Will", "aliases": ["Detective Will"]}],
+            "glossary": [{"source": "case file", "target": "නඩු ගොනුව"}],
+        }
+
+        prepared = prepare_translation_payload(payload)
+
+        self.assertEqual(("NAME", "TERM"), tuple(item["kind"] for item in prepared["protected_by_cue"]["1"]))
+        self.assertEqual({"style": "formal", "character_term_count": 2, "glossary_term_count": 1}, prepared["profile"])
+
     def test_returns_quality_warnings_for_dense_target(self) -> None:
         payload = parse_payload({"format": "srt", "content": SRT})
         payload["cues"][0]["target_text"] = "A" * 60

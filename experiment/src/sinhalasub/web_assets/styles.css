@@ -301,11 +301,14 @@ main { min-height: calc(100vh - 136px); }
 .preparation-panel .eyebrow { color: #dfa956; margin-bottom: 9px; }
 .preparation-panel h2 { margin: 0; font-family: var(--serif); font-size: clamp(25px, 3vw, 38px); font-weight: 400; }
 .preparation-panel p { max-width: 690px; margin: 12px 0 0; color: #bdb5aa; line-height: 1.55; }
-.prepare-form label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.prepare-form { display: grid; gap: 12px; }
+.prepare-form label { display: grid; gap: 7px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .prepare-form label small { color: #9f978d; font-weight: 500; }
-.prepare-controls { display: flex; }
-.prepare-controls input { min-width: 0; flex: 1; min-height: 46px; padding: 0 13px; border: 1px solid #635d55; border-right: 0; color: var(--ink); background: var(--surface); outline: 0; }
-.prepare-controls input:focus { border-color: var(--gold); }
+.profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.profile-fields label:last-child { grid-column: 1 / 3; }
+.profile-fields textarea, .profile-fields select { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #635d55; border-radius: 0; color: var(--ink); background: var(--surface); outline: 0; font: inherit; letter-spacing: normal; text-transform: none; resize: vertical; }
+.profile-fields select { min-height: 42px; resize: none; }
+.profile-fields textarea:focus, .profile-fields select:focus { border-color: var(--gold); }
 .secondary-button { min-height: 46px; padding: 0 20px; border: 1px solid var(--gold); color: #fff; background: transparent; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
 .secondary-button:hover { color: var(--ink); background: var(--gold); }
 .secondary-button:disabled { opacity: 0.55; cursor: wait; }
@@ -423,8 +426,8 @@ footer {
   .workspace-actions button { width: 100%; }
   .export-button { width: 100%; }
   .integrity-bar > div { padding: 14px; }
-  .prepare-controls { align-items: stretch; flex-direction: column; gap: 8px; }
-  .prepare-controls input { border-right: 1px solid #635d55; }
+  .profile-fields { grid-template-columns: 1fr; }
+  .profile-fields label:last-child { grid-column: auto; }
   .file-handling { grid-template-columns: 1fr; }
   .toolbar { align-items: stretch; flex-direction: column; }
   .search-field { min-width: 100%; }
