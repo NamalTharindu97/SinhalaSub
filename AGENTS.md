@@ -1,23 +1,31 @@
-# Repository Status
+# Scope And Boundaries
 
-- Product research is in `docs/AI_Powered_English_to_Sinhala_Subtitle_Research_Report.docx`; the delivery plan starts at `docs/plans/README.md`.
-- The only implementation is the Python 3.9+ standard-library Phase 0 harness under `experiment/`; its decision and limits are in `docs/decisions/0001-experiment-tool-shape.md`. Next.js/FastAPI/PostgreSQL/Redis remain unapproved production candidates.
-- Translation preparation is provider-neutral and has no live AI integration; `EchoProvider` only verifies cue/placeholder contracts. See `docs/decisions/0002-translation-provider-contract.md` before adding an adapter.
-- Execute Phase 0 validation and the controlled translation experiment before building the full SaaS; the go/no-go thresholds and pivot outcomes are in `docs/plans/02-validation-plan.md`.
-- The MVP is private, authorised-use, subtitle-only, and human-in-the-loop. Preserve cue IDs/count/timestamps, keep global training off by default, and do not add video upload, public subtitle distribution, unlicensed scraping, or unlicensed training data.
+- The only implementation is the Python 3.9+ standard-library Phase 0 harness in `experiment/`; there is no dependency manifest, install step, CI workflow, or approved production stack. Start with `experiment/README.md` and `docs/plans/README.md`.
+- Do not build the proposed Next.js/FastAPI/PostgreSQL/Redis SaaS until the real Phase 0 decision gate passes. Current corpus, providers, runs, evaluator records, and decision evidence are synthetic protocol fixtures and remain `not-authorized`.
+- There is no live AI adapter. `EchoProvider` only contract-tests cue IDs and protected placeholders; read `docs/decisions/0002-translation-provider-contract.md` before connecting a provider.
+- Preserve subtitle cue IDs, count, order, and timestamps. The product remains private, authorised-use, subtitle-only, human-reviewed, and training-off by default; do not add video upload, public distribution, unlicensed scraping, or unlicensed training data.
+- Fixtures must be synthetic, commissioned, licensed, or public-domain, with provenance recorded beside them. Repository visibility being public does not relax product/data privacy constraints.
 
-# Experiment Commands
+# Verification
 
-- Run all tests: `python3 -m unittest discover -s experiment/tests -v`.
-- Run one module: `python3 -m unittest experiment.tests.test_subtitles -v`.
-- Start the local GUI: `PYTHONPATH=experiment/src python3 -m sinhalasub.web --open` (defaults to `http://127.0.0.1:8765`).
-- The local GUI is intentionally non-persistent: uploads are parsed in memory, full source paths are unavailable to browser code, reload clears the workspace, and exports go through browser downloads.
-- Normalize a file: `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt` (use matching SRT or WebVTT extensions).
-- Build the synthetic blinded dry run: `PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli experiment/examples/blinded-manifest.json /tmp/sinhalasub-evaluators.zip --key /tmp/sinhalasub-confidential-key.json --allow-not-ready-freeze`. Never distribute the separate key to evaluators; never use the override with a real freeze.
-- Analyze the three synthetic responses only after building that package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli /tmp/sinhalasub-evaluators.zip /tmp/sinhalasub-confidential-key.json experiment/examples/responses/evaluator-1.json experiment/examples/responses/evaluator-2.json experiment/examples/responses/evaluator-3.json --output /tmp/sinhalasub-confidential-analysis.json`.
-- Audit the intentionally undersized synthetic corpus: `PYTHONPATH=experiment/src python3 -m sinhalasub.corpus_cli experiment/examples/corpus-manifest.json --output /tmp/sinhalasub-corpus-audit.json --allow-not-ready`. Never treat this dry run as a ready evaluation corpus.
-- Generate corpus workflow records with `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli annotation ...` and `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli adjudication ...`; adjudication inputs must be completed independent annotation records.
-- Audit the synthetic system freeze with `PYTHONPATH=experiment/src python3 -m sinhalasub.system_freeze_cli experiment/examples/system-freeze-manifest.json --output /tmp/sinhalasub-system-freeze-audit.json --allow-not-ready`; dry-run freezes never authorize a real experiment.
-- Audit synthetic system outputs with `PYTHONPATH=experiment/src python3 -m sinhalasub.run_capture_cli experiment/examples/run-capture-manifest.json --output /tmp/sinhalasub-run-audit.json --allow-not-ready`; packaging verifies these captured output hashes.
-- Audit the synthetic decision gate with `PYTHONPATH=experiment/src python3 -m sinhalasub.decision_cli experiment/examples/decision-manifest.json --output /tmp/sinhalasub-decision-audit.json --allow-not-authorized`; synthetic evidence must remain `not-authorized`.
-- Test fixtures must be synthetic, commissioned, licensed, or public-domain; record their provenance beside the fixtures.
+- Run from the repository root. Full gate: `python3 -m unittest discover -s experiment/tests -v`, then `python3 -m compileall -q experiment/src experiment/tests`, then `git diff --check`.
+- Focus a module: `python3 -m unittest experiment.tests.test_subtitles -v`; focus a method: `python3 -m unittest experiment.tests.test_subtitles.SrtTests.test_parses_canonical_cues -v`.
+- Start the non-persistent local GUI with `PYTHONPATH=experiment/src python3 -m sinhalasub.web --open` (`http://127.0.0.1:8765`). Uploads stay in memory, reload clears state, and exports are browser downloads.
+- Normalize matching SRT/WebVTT formats with `PYTHONPATH=experiment/src python3 -m sinhalasub.cli input.srt output.srt`.
+
+# Experiment Chain
+
+- Evidence is hash-linked in this order: corpus/annotations -> system freeze -> run capture -> blinded package/key -> evaluator analysis -> decision evidence. Editing an upstream fixture invalidates hashes in downstream manifests or responses; regenerate/update the chain rather than bypassing checks.
+- Corpus audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.corpus_cli experiment/examples/corpus-manifest.json --output /tmp/sinhalasub-corpus-audit.json --allow-not-ready`.
+- Annotation templates: `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli annotation ...`; adjudication accepts only completed independent records via `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli adjudication ...`.
+- Freeze audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.system_freeze_cli experiment/examples/system-freeze-manifest.json --output /tmp/sinhalasub-system-freeze-audit.json --allow-not-ready`.
+- Run audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.run_capture_cli experiment/examples/run-capture-manifest.json --output /tmp/sinhalasub-run-audit.json --allow-not-ready`.
+- Build the synthetic evaluator package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli experiment/examples/blinded-manifest.json /tmp/sinhalasub-evaluators.zip --key /tmp/sinhalasub-confidential-key.json --allow-not-ready-freeze`. Never distribute the key to evaluators.
+- Analyze responses only after rebuilding that exact package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli /tmp/sinhalasub-evaluators.zip /tmp/sinhalasub-confidential-key.json experiment/examples/responses/evaluator-1.json experiment/examples/responses/evaluator-2.json experiment/examples/responses/evaluator-3.json --output /tmp/sinhalasub-confidential-analysis.json`.
+- Decision audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.decision_cli experiment/examples/decision-manifest.json --output /tmp/sinhalasub-decision-audit.json --allow-not-authorized`; the synthetic outcome must remain `not-authorized`.
+- `--allow-not-ready`, `--allow-not-ready-freeze`, and `--allow-not-authorized` are synthetic dry-run controls only. Never use them to approve a real corpus, provider freeze, run, or product decision.
+
+# Git Workflow
+
+- Develop completed slices on named feature branches, push the feature branch, merge the verified branch into `main` with a normal merge commit, and push `main`.
+- Keep feature branches locally and remotely after merging; do not delete them.
