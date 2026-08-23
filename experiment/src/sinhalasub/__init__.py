@@ -72,6 +72,17 @@ from .editing_analysis import (
     EDITING_TIME_THRESHOLD,
     analyze_editing_sessions,
 )
+from .viewer_study import (
+    VIEWER_ANALYSIS_SCHEMA,
+    VIEWER_KEY_SCHEMA,
+    VIEWER_MANIFEST_SCHEMA,
+    VIEWER_PACKAGE_SCHEMA,
+    VIEWER_PREFERENCE_THRESHOLD,
+    VIEWER_RESPONSES_SCHEMA,
+    analyze_viewer_responses,
+    build_viewer_study,
+    viewer_package_digest,
+)
 from .project_context import (
     PROJECT_CONTEXT_SCHEMA,
     Character,
@@ -141,6 +152,15 @@ __all__ = [
     "EDITING_MANIFEST_SCHEMA",
     "EDITING_TIME_THRESHOLD",
     "analyze_editing_sessions",
+    "VIEWER_ANALYSIS_SCHEMA",
+    "VIEWER_KEY_SCHEMA",
+    "VIEWER_MANIFEST_SCHEMA",
+    "VIEWER_PACKAGE_SCHEMA",
+    "VIEWER_PREFERENCE_THRESHOLD",
+    "VIEWER_RESPONSES_SCHEMA",
+    "analyze_viewer_responses",
+    "build_viewer_study",
+    "viewer_package_digest",
     "PROJECT_CONTEXT_SCHEMA",
     "Character",
     "GlossaryEntry",

@@ -15,7 +15,7 @@
 
 # Experiment Chain
 
-- Evidence is hash-linked in this order: corpus/annotations -> system freeze -> run capture -> blinded package/key -> evaluator analysis and paired editing analysis -> decision evidence. Editing an upstream fixture invalidates hashes in downstream manifests or responses; regenerate/update the chain rather than bypassing checks.
+- Evidence is hash-linked in this order: corpus/annotations -> system freeze -> run capture -> blinded translator and viewer packages/keys -> evaluator, paired editing, and viewer analyses -> decision evidence. Editing an upstream fixture invalidates hashes in downstream manifests or responses; regenerate/update the chain rather than bypassing checks.
 - Corpus audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.corpus_cli experiment/examples/corpus-manifest.json --output /tmp/sinhalasub-corpus-audit.json --allow-not-ready`.
 - Annotation templates: `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli annotation ...`; adjudication accepts only completed independent records via `PYTHONPATH=experiment/src python3 -m sinhalasub.annotation_cli adjudication ...`.
 - Freeze audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.system_freeze_cli experiment/examples/system-freeze-manifest.json --output /tmp/sinhalasub-system-freeze-audit.json --allow-not-ready`.
@@ -23,6 +23,7 @@
 - Build the synthetic evaluator package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.experiment_cli experiment/examples/blinded-manifest.json /tmp/sinhalasub-evaluators.zip --key /tmp/sinhalasub-confidential-key.json --allow-not-ready-freeze`. Never distribute the key to evaluators.
 - Analyze responses only after rebuilding that exact package/key: `PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli /tmp/sinhalasub-evaluators.zip /tmp/sinhalasub-confidential-key.json experiment/examples/responses/evaluator-1.json experiment/examples/responses/evaluator-2.json experiment/examples/responses/evaluator-3.json --output /tmp/sinhalasub-confidential-analysis.json`.
 - Analyze paired review reports with `PYTHONPATH=experiment/src python3 -m sinhalasub.editing_cli experiment/examples/editing-session-manifest.json --output /tmp/sinhalasub-editing-analysis.json --allow-not-ready`.
+- Build and analyze the subtitle-only viewer dry run with `PYTHONPATH=experiment/src python3 -m sinhalasub.viewer_cli build experiment/examples/viewer-study-manifest.json --package /tmp/sinhalasub-viewer-package.json --key /tmp/sinhalasub-viewer-key.json`, then `PYTHONPATH=experiment/src python3 -m sinhalasub.viewer_cli analyze /tmp/sinhalasub-viewer-package.json /tmp/sinhalasub-viewer-key.json experiment/examples/viewer-responses.json --output /tmp/sinhalasub-viewer-analysis.json --allow-not-ready`. Never distribute the key or any licensed clip outside approved access controls.
 - Decision audit: `PYTHONPATH=experiment/src python3 -m sinhalasub.decision_cli experiment/examples/decision-manifest.json --output /tmp/sinhalasub-decision-audit.json --allow-not-authorized`; the synthetic outcome must remain `not-authorized`.
 - `--allow-not-ready`, `--allow-not-ready-freeze`, and `--allow-not-authorized` are synthetic dry-run controls only. Never use them to approve a real corpus, provider freeze, run, or product decision.
 
