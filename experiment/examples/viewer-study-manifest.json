@@ -1,0 +1,31 @@
+{
+  "schema_version": "sinhalasub.viewer-study-manifest.v1",
+  "study_id": "synthetic-viewer-study-001",
+  "dry_run": true,
+  "seed": 20260823,
+  "run_capture": "run-capture-manifest.json",
+  "run_capture_sha256": "12e0c31d80994f7001954b731c1c38147683032418cece9620a24982d02ccdc4",
+  "baseline_system_id": "synthetic-baseline",
+  "contextual_system_id": "synthetic-contextual",
+  "assets": [
+    {
+      "asset_id": "synthetic-dialogue-sample",
+      "clip_reference": "synthetic-control://crime-scene-001",
+      "rights_basis": "Repository-authored synthetic protocol fixture; no video is distributed.",
+      "questions": [
+        {
+          "question_id": "intent",
+          "prompt": "Which item is mentioned?",
+          "options": ["A suitcase", "A box", "A letter"],
+          "correct_option": 1
+        },
+        {
+          "question_id": "location",
+          "prompt": "How many times were they charged?",
+          "options": ["Twice", "Three times", "Once"],
+          "correct_option": 0
+        }
+      ]
+    }
+  ]
+}

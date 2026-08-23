@@ -101,6 +101,32 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.editing_cli \
 
 The confidential manifest embeds each original `sinhalasub.experiment-report.v1` with its assignment. The audit rejects missing pairs, duplicate assignments or reports, source substitutions, invalid telemetry, and fewer than three reviewers. It reports median active editing time by system, the paired median proportional reduction, and a seeded 95% bootstrap interval. The synthetic example passes the 25% metric but remains not ready; `--allow-not-ready` is only a dry-run control.
 
+## Blinded Viewer A/B Study
+
+Build a subtitle-only viewer package and separate confidential key from the audited run capture:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.viewer_cli build \
+  experiment/examples/viewer-study-manifest.json \
+  --package /tmp/sinhalasub-viewer-package.json \
+  --key /tmp/sinhalasub-viewer-key.json
+```
+
+The viewer package contains neutral candidate labels, subtitle text, controlled clip references, rights declarations, and comprehension prompts/options. It contains no video, system identities, or correct answers. Keep the key confidential.
+
+Analyze the 30-response synthetic dry run:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.viewer_cli analyze \
+  /tmp/sinhalasub-viewer-package.json \
+  /tmp/sinhalasub-viewer-key.json \
+  experiment/examples/viewer-responses.json \
+  --output /tmp/sinhalasub-viewer-analysis.json \
+  --allow-not-ready
+```
+
+The analysis verifies consent flags, package hashes, unique pseudonyms, complete assignments, presentation order, preferences, and comprehension answers. It reports preference with a 95% Wilson interval, comprehension by system, per-asset preference, and cloud-upload acceptance. The synthetic result passes the 65% observed-preference threshold but remains not ready. Real evidence also requires a ready run and at least 30 viewers using licensed, access-controlled clips.
+
 ## Evaluation Corpus Audit
 
 Audit the small synthetic corpus manifest while explicitly allowing its expected not-ready status:
