@@ -29,7 +29,7 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.web --open
 
 Then open `http://127.0.0.1:8765`. The workspace accepts an SRT/WebVTT file, keeps timing locked, prepares context/protected values, lets you edit target text, and exports a reviewed copy. It runs locally and does not translate text with AI yet.
 
-The preparation step accepts comma-separated confirmed character names. It also protects detected numbers, dates, currencies, and URLs. The repository currently includes only an echo provider for contract testing; no live AI provider is configured.
+The preparation panel accepts character aliases (`name | alias, alias`), approved glossary entries (`source = Sinhala target`), and dialogue style. Names/aliases, glossary targets, numbers, dates, currencies, and URLs are protected through provider round trips. The versioned example is `examples/project-context.json`. The repository still includes only an echo provider for contract testing; no live AI provider is configured.
 
 ## Local File Handling
 

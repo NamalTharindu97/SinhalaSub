@@ -38,7 +38,11 @@ class ExperimentReportTests(unittest.TestCase):
             self.target,
             "/hidden/path/sample.srt",
             self.session,
-            preparation={"blocks": [{"id": "block-1"}], "protected_count": 2},
+            preparation={
+                "blocks": [{"id": "block-1"}],
+                "protected_count": 2,
+                "profile": {"style": "formal", "character_term_count": 2, "glossary_term_count": 1},
+            },
             quality={
                 "counts": {"high": 1, "medium": 0, "low": 0},
                 "warnings_by_cue": {"1": [{"code": "READING_SPEED"}]},
@@ -52,6 +56,8 @@ class ExperimentReportTests(unittest.TestCase):
         self.assertEqual(1, report["review"]["approved_cue_count"])
         self.assertEqual("manual-source-copy", report["system"]["condition"])
         self.assertIsNone(report["system"]["provider"])
+        self.assertEqual("formal", report["system"]["style"])
+        self.assertEqual(1, report["system"]["glossary_terms"])
         self.assertEqual("ආයුබෝවන්.", report["cues"][0]["final_text"])
         self.assertEqual(["READING_SPEED"], report["cues"][0]["warning_codes"])
 

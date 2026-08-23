@@ -39,6 +39,8 @@ def build_experiment_report(
         raise ValueError("Active edit time cannot exceed elapsed time.")
 
     quality = quality or {}
+    preparation = preparation or {}
+    profile = preparation.get("profile", {})
     warnings_by_cue = quality.get("warnings_by_cue", {})
     return {
         "schema_version": REPORT_SCHEMA,
@@ -55,8 +57,11 @@ def build_experiment_report(
             "provider": None,
             "model": None,
             "prompt_version": None,
-            "context_blocks": len((preparation or {}).get("blocks", [])),
-            "protected_values": int((preparation or {}).get("protected_count", 0)),
+            "context_blocks": len(preparation.get("blocks", [])),
+            "protected_values": int(preparation.get("protected_count", 0)),
+            "style": str(profile.get("style", "conversational")),
+            "character_terms": int(profile.get("character_term_count", 0)),
+            "glossary_terms": int(profile.get("glossary_term_count", 0)),
             "provider_latency_ms": None,
             "input_units": 0,
             "output_units": 0,

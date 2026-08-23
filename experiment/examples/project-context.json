@@ -1,0 +1,12 @@
+{
+  "schema_version": "sinhalasub.project-context.v1",
+  "style": "conversational",
+  "characters": [
+    {"name": "Will", "aliases": ["Detective Will"]},
+    {"name": "Rose", "aliases": []}
+  ],
+  "glossary": [
+    {"source": "case file", "target": "නඩු ගොනුව"},
+    {"source": "evidence", "target": "සාක්ෂි"}
+  ]
+}

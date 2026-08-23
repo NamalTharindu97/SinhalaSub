@@ -8,10 +8,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sinhalasub import (  # noqa: E402
     EchoProvider,
+    PROJECT_CONTEXT_SCHEMA,
     SubtitleError,
     SubtitleFormat,
     TranslationCandidate,
     parse_subtitle,
+    parse_project_context,
     prepare_document,
     protect_text,
     restore_text,
@@ -46,6 +48,42 @@ class ProtectionTests(unittest.TestCase):
         self.assertEqual(1, len(values))
         self.assertEqual("NAME", values[0].kind)
         self.assertIn("I will stay", protected)
+
+    def test_glossary_term_restores_approved_target(self) -> None:
+        protected, values = protect_text("Open the case file.", glossary={"case file": "නඩු ගොනුව"})
+
+        self.assertNotIn("case file", protected)
+        self.assertEqual("TERM", values[0].kind)
+        self.assertEqual("Open the නඩු ගොනුව.", restore_text(protected, values))
+
+
+class ProjectContextTests(unittest.TestCase):
+    def test_validates_characters_aliases_and_glossary(self) -> None:
+        context = parse_project_context(
+            {
+                "schema_version": PROJECT_CONTEXT_SCHEMA,
+                "style": "formal",
+                "characters": [{"name": "Will", "aliases": ["Detective Will"]}],
+                "glossary": [{"source": "case file", "target": "නඩු ගොනුව"}],
+            }
+        )
+
+        self.assertEqual(("Will", "Detective Will"), context.names_and_aliases)
+        self.assertEqual({"case file": "නඩු ගොනුව"}, context.glossary_map)
+
+    def test_rejects_alias_shared_by_characters(self) -> None:
+        with self.assertRaisesRegex(ValueError, "globally unique"):
+            parse_project_context(
+                {
+                    "schema_version": PROJECT_CONTEXT_SCHEMA,
+                    "style": "conversational",
+                    "characters": [
+                        {"name": "Will", "aliases": ["Detective"]},
+                        {"name": "Rose", "aliases": ["Detective"]},
+                    ],
+                    "glossary": [],
+                }
+            )
 
 
 class ContextTests(unittest.TestCase):
@@ -96,6 +134,34 @@ class ProviderContractTests(unittest.TestCase):
 
         with self.assertRaisesRegex(SubtitleError, "PROTECTED_VALUE_MISMATCH"):
             run_translation(self.cues, self.blocks, MissingValueProvider())
+
+    def test_echo_provider_applies_approved_glossary_target(self) -> None:
+        document = parse_subtitle(
+            "1\n00:00:01,000 --> 00:00:02,000\nOpen the case file.\n",
+            SubtitleFormat.SRT,
+        )
+        cues, blocks = prepare_document(document, glossary={"case file": "නඩු ගොනුව"})
+
+        candidates = run_translation(cues, blocks, EchoProvider())
+
+        self.assertEqual("Open the නඩු ගොනුව.", candidates[0].text)
+
+    def test_translation_request_carries_selected_style(self) -> None:
+        observed = []
+
+        class StyleProvider:
+            name = "style"
+
+            def translate(self, request):
+                observed.append(request.style)
+                return tuple(
+                    TranslationCandidate(cue_id=cue.id, text=cue.protected_text)
+                    for cue in request.cues
+                )
+
+        run_translation(self.cues, self.blocks, StyleProvider(), style="formal")
+
+        self.assertEqual(["formal"], observed)
 
 
 if __name__ == "__main__":
