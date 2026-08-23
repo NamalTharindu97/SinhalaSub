@@ -38,7 +38,7 @@ Do not build the full SaaS before the Phase 0 experiment passes. A technically c
 
 - Phase 1 Slice 1 is implemented in the local Python harness: SRT/WebVTT integrity, normalized export, tests, and GUI.
 - Phase 1 Slice 2 has provider-neutral context blocks, a versioned character/alias/glossary/style profile, deterministic glossary enforcement, and protected-value contracts, but no live baseline or AI adapter.
-- Phase 1 Slice 3 has deterministic QA, versioned local review reports, reproducible blinded packaging, and confidential rubric/preference aggregation; real frozen system outputs and human evaluator protocol approval remain outstanding.
+- Phase 1 Slice 3 has deterministic QA, versioned local review reports, reproducible blinded packaging, controlled critical-error categories, and confidential rubric/preference analysis stratified by genre and challenge phenomenon; real frozen system outputs and human evaluator protocol approval remain outstanding.
 - Provider-neutral system-freeze auditing pins the three experiment roles, corpus/instruction hashes, model and adapter versions, policy review, seed, and rubric; only a synthetic not-ready record exists because no live provider or policy has been approved.
 - System-run auditing requires every frozen system/corpus pair, verifies output structure and hashes, captures latency/usage/cost, and binds blinded packages to those outputs; current evidence remains synthetic and not ready.
 - The Phase 0 decision gate now applies the frozen go/narrow/local-pivot/stop thresholds to hash-bound evidence, but the repository dry run is explicitly `not-authorized`; interviews, legal approval, real corpus/runs, translators, viewers, and independent review remain external blockers.

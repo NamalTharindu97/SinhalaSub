@@ -56,6 +56,16 @@ def build_from_manifest(
     source_hash = hashlib.sha256(serialize_subtitle(source_document).encode("utf-8")).hexdigest()
     if source_hash not in {asset["source_sha256"] for asset in corpus_audit["assets"]}:
         raise ValueError("Package source does not belong to the frozen corpus.")
+    source_asset_report = next(asset for asset in corpus_audit["assets"] if asset["source_sha256"] == source_hash)
+    corpus_manifest = json.loads(corpus_path.read_text(encoding="utf-8"))
+    source_asset = next(asset for asset in corpus_manifest["assets"] if asset["id"] == source_asset_report["id"])
+    evaluation_metadata = {
+        "genre": source_asset["genre"],
+        "challenge_tags_by_cue": {
+            str(challenge["cue_id"]): list(challenge["tags"])
+            for challenge in source_asset.get("challenges", [])
+        },
+    }
 
     run_path = (root / manifest["run_capture"]).resolve()
     run_audit = audit_run_capture(run_path)
@@ -116,6 +126,7 @@ def build_from_manifest(
             "manifest_sha256": run_audit["manifest_sha256"],
             "ready": run_audit["ready"],
         },
+        evaluation_metadata=evaluation_metadata,
     )
     write_blinded_package(package, key, package_path, key_path)
 

@@ -128,6 +128,9 @@ class ExperimentCliTests(unittest.TestCase):
             self.assertEqual("synthetic-system-freeze-001", key["system_freeze"]["id"])
             self.assertTrue(key["system_freeze"]["dry_run"])
             self.assertEqual("synthetic-system-run-001", key["system_run"]["id"])
+            self.assertEqual("crime-action", key["blocks"][0]["genre"])
+            self.assertIn("ambiguous-name", key["blocks"][0]["challenge_tags"])
+            self.assertNotIn("crime-action", json.dumps(package))
 
     def test_rejects_synthetic_freeze_without_explicit_override(self) -> None:
         manifest = ROOT / "examples" / "blinded-manifest.json"

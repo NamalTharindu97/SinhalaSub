@@ -51,6 +51,10 @@ class EvaluationTests(unittest.TestCase):
             systems,
             "Synthetic",
             "Repository-authored",
+            evaluation_metadata={
+                "genre": "modern-drama",
+                "challenge_tags_by_cue": {"1": ["idiom"], "2": ["negation"]},
+            },
         )
 
     def response(self, evaluator_id: str, preferred_system: str = "system-c"):
@@ -65,6 +69,7 @@ class EvaluationTests(unittest.TestCase):
                         "label": candidate["label"],
                         "scores": {dimension: 5 if preferred else 3 for dimension in RUBRIC_DIMENSIONS},
                         "critical_errors": 0 if preferred else 1,
+                        "critical_error_categories": {} if preferred else {"context_meaning": 1},
                         "preferred": preferred,
                     }
                 )
@@ -90,6 +95,15 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(5.0, by_system["system-c"]["overall_rubric_mean"])
         self.assertEqual(0, by_system["system-c"]["critical_error_total"])
         self.assertEqual(0.0, by_system["system-a"]["preference_rate"])
+        self.assertEqual(6, by_system["system-a"]["critical_error_categories"]["context_meaning"])
+        strata = {(item["kind"], item["value"]): item for item in analysis["strata"]}
+        self.assertIn(("genre", "modern-drama"), strata)
+        self.assertIn(("challenge", "idiom"), strata)
+        idiom_by_system = {
+            system["system_id"]: system
+            for system in strata[("challenge", "idiom")]["systems"]
+        }
+        self.assertEqual(3, idiom_by_system["system-a"]["critical_error_total"])
 
     def test_rejects_incomplete_candidate_scores(self) -> None:
         response = self.response("evaluator-1")
@@ -112,6 +126,13 @@ class EvaluationTests(unittest.TestCase):
         response["package_sha256"] = "0" * 64
 
         with self.assertRaisesRegex(ValueError, "hash does not match"):
+            aggregate_evaluator_responses(self.package, self.key, [response])
+
+    def test_rejects_critical_error_category_total_mismatch(self) -> None:
+        response = self.response("evaluator-1")
+        response["blocks"][0]["candidates"][0]["critical_error_categories"] = {"terminology": 2}
+
+        with self.assertRaisesRegex(ValueError, "must equal"):
             aggregate_evaluator_responses(self.package, self.key, [response])
 
     def test_cli_writes_confidential_analysis(self) -> None:
