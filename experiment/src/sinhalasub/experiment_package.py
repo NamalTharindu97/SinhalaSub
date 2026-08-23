@@ -24,6 +24,16 @@ RUBRIC_DIMENSIONS = (
     "cultural_appropriateness",
     "formatting",
 )
+CRITICAL_ERROR_CATEGORIES = (
+    "name_entity",
+    "context_meaning",
+    "omission_addition",
+    "tone_register",
+    "terminology",
+    "formatting_readability",
+    "hallucination",
+    "unclassified",
+)
 
 
 @dataclass(frozen=True)
@@ -42,6 +52,7 @@ def build_blinded_package(
     rights_basis: str,
     system_freeze: Optional[Mapping[str, Any]] = None,
     system_run: Optional[Mapping[str, Any]] = None,
+    evaluation_metadata: Optional[Mapping[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     if not experiment_id.strip() or not provenance.strip() or not rights_basis.strip():
         raise ValueError("Experiment ID, provenance, and rights basis are required.")
@@ -93,7 +104,21 @@ def build_blinded_package(
                 "candidates": candidates,
             }
         )
-        key_blocks.append({"block_id": block.id, "labels": label_map})
+        challenge_tags_by_cue = (evaluation_metadata or {}).get("challenge_tags_by_cue", {})
+        key_blocks.append(
+            {
+                "block_id": block.id,
+                "labels": label_map,
+                "genre": str((evaluation_metadata or {}).get("genre", "unspecified")),
+                "challenge_tags": sorted(
+                    {
+                        tag
+                        for cue_id in block.cue_ids
+                        for tag in challenge_tags_by_cue.get(cue_id, [])
+                    }
+                ),
+            }
+        )
 
     source_hash = _document_hash(source)
     package = {
@@ -112,6 +137,7 @@ def build_blinded_package(
             "candidate_labels_change_by_block": True,
             "response_schema": "sinhalasub.evaluator-response.v1",
             "rubric_dimensions": list(RUBRIC_DIMENSIONS),
+            "critical_error_categories": list(CRITICAL_ERROR_CATEGORIES[:-1]),
             "rubric_score_range": [1, 5],
             "preference_rule": "Select exactly one preferred candidate per block.",
         },

@@ -72,7 +72,7 @@ Give evaluators only the ZIP. The separate key contains the system-freeze ID/has
 
 ## Confidential Evaluation Analysis
 
-Evaluator responses use the eight 1-5 rubric dimensions embedded in the package and select exactly one preferred candidate per block. The repository includes three synthetic dry-run responses tied to the example package.
+Evaluator responses use the eight 1-5 rubric dimensions embedded in the package, select exactly one preferred candidate per block, and may allocate critical counts across the controlled error categories. The repository includes three synthetic dry-run responses tied to the example package; their original aggregate errors remain `unclassified` rather than being categorized retrospectively.
 
 After building the package and key above, validate and aggregate the responses:
 
@@ -86,7 +86,7 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli \
   --output /tmp/sinhalasub-confidential-analysis.json
 ```
 
-The output contains unblinded system-level rubric means, preference rates with 95% Wilson intervals, critical-error totals, and Fleiss' kappa for preference agreement. Keep both the key and analysis confidential until evaluator scoring is locked.
+The output contains unblinded system-level rubric means, preference rates with 95% Wilson intervals, categorized critical-error totals, Fleiss' kappa, and confidential genre/challenge strata. Genre and challenge tags exist only in the key, not the evaluator ZIP. Keep both the key and analysis confidential until evaluator scoring is locked.
 
 ## Evaluation Corpus Audit
 

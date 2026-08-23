@@ -22,6 +22,7 @@ The runner:
 - Requires explicit source provenance and rights basis.
 - Rejects any output that changes format, cue IDs, order, or timestamps.
 - Uses a fixed integer seed and block ID to deterministically shuffle labels separately for every context block.
+- Keeps corpus genre and challenge tags only in the confidential key; evaluator packages expose the critical-error vocabulary but not strata that could bias scoring.
 - Hashes normalized source/system files and the evaluator package, and records system-freeze and system-run identities/hashes in the confidential key.
 - Writes ZIP metadata deterministically so identical inputs reproduce identical bytes.
 

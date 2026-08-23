@@ -3,13 +3,17 @@
 import math
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
-from .experiment_package import KEY_SCHEMA, PACKAGE_SCHEMA, RUBRIC_DIMENSIONS, package_digest
+from .experiment_package import (
+    CRITICAL_ERROR_CATEGORIES,
+    KEY_SCHEMA,
+    PACKAGE_SCHEMA,
+    RUBRIC_DIMENSIONS,
+    package_digest,
+)
 
 
 RESPONSE_SCHEMA = "sinhalasub.evaluator-response.v1"
 ANALYSIS_SCHEMA = "sinhalasub.evaluation-analysis.v1"
-
-
 def aggregate_evaluator_responses(
     package: Mapping[str, Any],
     key: Mapping[str, Any],
@@ -24,13 +28,14 @@ def aggregate_evaluator_responses(
         raise ValueError("Evaluator IDs must be present and unique.")
 
     package_blocks = {block["id"]: block for block in package["blocks"]}
-    key_blocks = {block["block_id"]: block["labels"] for block in key["blocks"]}
+    key_blocks = {block["block_id"]: block for block in key["blocks"]}
     system_ids = [system["id"] for system in key["systems"]]
     values = {
         system_id: {
             "scores": {dimension: [] for dimension in RUBRIC_DIMENSIONS},
             "preferences": 0,
             "critical_errors": [],
+            "critical_error_categories": {category: 0 for category in CRITICAL_ERROR_CATEGORIES},
         }
         for system_id in system_ids
     }
@@ -38,20 +43,36 @@ def aggregate_evaluator_responses(
         block_id: {system_id: 0 for system_id in system_ids}
         for block_id in package_blocks
     }
+    strata: Dict[Tuple[str, str], Dict[str, Any]] = {}
 
     for response in responses:
         _validate_response(response, package, package_blocks)
         for block_response in response["blocks"]:
             block_id = block_response["block_id"]
-            label_map = key_blocks[block_id]
+            key_block = key_blocks[block_id]
+            label_map = key_block["labels"]
+            stratum_keys = [("genre", str(key_block.get("genre", "unspecified")))] + [
+                ("challenge", str(tag)) for tag in key_block.get("challenge_tags", [])
+            ]
             for candidate in block_response["candidates"]:
                 system_id = label_map[candidate["label"]]
+                category_counts = _critical_error_counts(candidate)
                 for dimension in RUBRIC_DIMENSIONS:
                     values[system_id]["scores"][dimension].append(int(candidate["scores"][dimension]))
                 values[system_id]["critical_errors"].append(int(candidate["critical_errors"]))
+                for category, count in category_counts.items():
+                    values[system_id]["critical_error_categories"][category] += count
                 if candidate["preferred"]:
                     values[system_id]["preferences"] += 1
                     preference_by_block[block_id][system_id] += 1
+                for stratum_key in stratum_keys:
+                    stratum = strata.setdefault(stratum_key, _empty_stratum(system_ids))
+                    system_stratum = stratum[system_id]
+                    system_stratum["observations"] += 1
+                    system_stratum["preferences"] += int(candidate["preferred"])
+                    system_stratum["critical_errors"] += int(candidate["critical_errors"])
+                    for category, count in category_counts.items():
+                        system_stratum["critical_error_categories"][category] += count
 
     observations = len(responses) * len(package_blocks)
     systems = []
@@ -73,6 +94,7 @@ def aggregate_evaluator_responses(
                 "preference_ci_95": [round(bound, 4) for bound in _wilson_interval(preference_count, observations)],
                 "critical_error_total": sum(system["critical_errors"]),
                 "critical_errors_per_block": round(_mean(system["critical_errors"]), 4),
+                "critical_error_categories": dict(system["critical_error_categories"]),
             }
         )
 
@@ -84,6 +106,24 @@ def aggregate_evaluator_responses(
         "block_count": len(package_blocks),
         "preference_fleiss_kappa": _fleiss_kappa(tuple(preference_by_block.values()), len(responses)),
         "systems": systems,
+        "strata": [
+            {
+                "kind": kind,
+                "value": value,
+                "systems": [
+                    {
+                        "system_id": system_id,
+                        "observations": system["observations"],
+                        "preference_count": system["preferences"],
+                        "preference_rate": round(system["preferences"] / system["observations"], 4),
+                        "critical_error_total": system["critical_errors"],
+                        "critical_error_categories": dict(system["critical_error_categories"]),
+                    }
+                    for system_id, system in stratum.items()
+                ],
+            }
+            for (kind, value), stratum in sorted(strata.items())
+        ],
     }
 
 
@@ -103,6 +143,12 @@ def _validate_package_and_key(package: Mapping[str, Any], key: Mapping[str, Any]
         package_labels = {candidate["label"] for candidate in package_block["candidates"]}
         if set(key_block["labels"]) != package_labels or set(key_block["labels"].values()) != system_ids:
             raise ValueError("Confidential key candidate mappings do not match the package and systems.")
+        genre = key_block.get("genre")
+        tags = key_block.get("challenge_tags")
+        if not isinstance(genre, str) or not genre.strip():
+            raise ValueError("Confidential key blocks require a genre.")
+        if not isinstance(tags, list) or len(tags) != len(set(tags)) or any(not isinstance(tag, str) or not tag for tag in tags):
+            raise ValueError("Confidential key block challenge tags must be unique non-empty strings.")
 
 
 def _validate_response(
@@ -137,12 +183,39 @@ def _validate_response(
             critical_errors = candidate.get("critical_errors")
             if type(critical_errors) is not int or critical_errors < 0:
                 raise ValueError("Critical errors must be a non-negative integer.")
+            categories = candidate.get("critical_error_categories")
+            if categories is not None:
+                if not isinstance(categories, dict) or not set(categories) <= set(CRITICAL_ERROR_CATEGORIES) - {"unclassified"}:
+                    raise ValueError("Critical-error categories contain unsupported values.")
+                if any(type(count) is not int or count < 0 for count in categories.values()):
+                    raise ValueError("Critical-error category counts must be non-negative integers.")
+                if sum(categories.values()) != critical_errors:
+                    raise ValueError("Critical-error category counts must equal critical_errors.")
             if type(candidate.get("preferred")) is not bool:
                 raise ValueError("Preferred must be a boolean.")
 
 
 def _mean(values: Sequence[float]) -> float:
     return sum(values) / len(values)
+
+
+def _critical_error_counts(candidate: Mapping[str, Any]) -> Dict[str, int]:
+    categories = candidate.get("critical_error_categories")
+    if categories is None:
+        return {"unclassified": int(candidate["critical_errors"])}
+    return {str(category): int(count) for category, count in categories.items()}
+
+
+def _empty_stratum(system_ids: Sequence[str]) -> Dict[str, Any]:
+    return {
+        system_id: {
+            "observations": 0,
+            "preferences": 0,
+            "critical_errors": 0,
+            "critical_error_categories": {category: 0 for category in CRITICAL_ERROR_CATEGORIES},
+        }
+        for system_id in system_ids
+    }
 
 
 def _wilson_interval(successes: int, observations: int, z: float = 1.96) -> Tuple[float, float]:

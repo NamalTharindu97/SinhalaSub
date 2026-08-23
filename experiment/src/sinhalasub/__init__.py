@@ -32,6 +32,7 @@ from .experiment_package import (
 )
 from .evaluation import (
     ANALYSIS_SCHEMA,
+    CRITICAL_ERROR_CATEGORIES,
     RESPONSE_SCHEMA,
     RUBRIC_DIMENSIONS,
     aggregate_evaluator_responses,
@@ -103,6 +104,7 @@ __all__ = [
     "write_blinded_package",
     "package_digest",
     "ANALYSIS_SCHEMA",
+    "CRITICAL_ERROR_CATEGORIES",
     "RESPONSE_SCHEMA",
     "RUBRIC_DIMENSIONS",
     "aggregate_evaluator_responses",
