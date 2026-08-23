@@ -27,7 +27,7 @@ The confidential key binds each block to its corpus genre and challenge phenomen
 - Evaluators never need the confidential key.
 - Response files remain blinded and can be audited independently before unblinding.
 - Legacy/synthetic responses with only an aggregate critical count remain valid and are reported as `unclassified`; categories are never inferred after scoring.
-- The summary does not yet calculate editing-time effects; versioned review reports are analyzed separately until the real protocol defines pairing identifiers.
+- Editing-time effects remain separate from rubric analysis. ADR 0011 defines confidential reviewer/asset pairing over versioned review reports.
 - Statistical outputs are descriptive for small dry runs and must not be presented as proof of quality.
 
 ## Security, Privacy, Legal, And Cost

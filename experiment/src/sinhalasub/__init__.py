@@ -66,6 +66,12 @@ from .decision_gate import (
     DECISION_MANIFEST_SCHEMA,
     audit_decision,
 )
+from .editing_analysis import (
+    EDITING_ANALYSIS_SCHEMA,
+    EDITING_MANIFEST_SCHEMA,
+    EDITING_TIME_THRESHOLD,
+    analyze_editing_sessions,
+)
 from .project_context import (
     PROJECT_CONTEXT_SCHEMA,
     Character,
@@ -131,6 +137,10 @@ __all__ = [
     "DECISION_EVIDENCE_SCHEMA",
     "DECISION_MANIFEST_SCHEMA",
     "audit_decision",
+    "EDITING_ANALYSIS_SCHEMA",
+    "EDITING_MANIFEST_SCHEMA",
+    "EDITING_TIME_THRESHOLD",
+    "analyze_editing_sessions",
     "PROJECT_CONTEXT_SCHEMA",
     "Character",
     "GlossaryEntry",

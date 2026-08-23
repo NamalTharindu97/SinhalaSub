@@ -1,0 +1,34 @@
+{
+  "schema_version": "sinhalasub.editing-sessions.v1",
+  "analysis_id": "synthetic-paired-editing-v1",
+  "dry_run": true,
+  "baseline_system_id": "isolated-line-llm",
+  "contextual_system_id": "contextual-llm",
+  "seed": 20260823,
+  "sessions": [
+    {
+      "session_id": "edit-001-baseline", "reviewer_id": "translator-001", "asset_id": "synthetic-crime-scene", "system_id": "isolated-line-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T08:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 100000, "elapsed_ms": 130000, "changed_cue_count": 10, "keyboard_actions": 80, "edit_events": 24}}
+    },
+    {
+      "session_id": "edit-001-contextual", "reviewer_id": "translator-001", "asset_id": "synthetic-crime-scene", "system_id": "contextual-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T09:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 70000, "elapsed_ms": 95000, "changed_cue_count": 7, "keyboard_actions": 55, "edit_events": 17}}
+    },
+    {
+      "session_id": "edit-002-baseline", "reviewer_id": "translator-002", "asset_id": "synthetic-crime-scene", "system_id": "isolated-line-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T10:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 120000, "elapsed_ms": 150000, "changed_cue_count": 12, "keyboard_actions": 90, "edit_events": 28}}
+    },
+    {
+      "session_id": "edit-002-contextual", "reviewer_id": "translator-002", "asset_id": "synthetic-crime-scene", "system_id": "contextual-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T11:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 90000, "elapsed_ms": 115000, "changed_cue_count": 8, "keyboard_actions": 62, "edit_events": 19}}
+    },
+    {
+      "session_id": "edit-003-baseline", "reviewer_id": "translator-003", "asset_id": "synthetic-crime-scene", "system_id": "isolated-line-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T12:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 90000, "elapsed_ms": 120000, "changed_cue_count": 9, "keyboard_actions": 72, "edit_events": 22}}
+    },
+    {
+      "session_id": "edit-003-contextual", "reviewer_id": "translator-003", "asset_id": "synthetic-crime-scene", "system_id": "contextual-llm",
+      "report": {"schema_version": "sinhalasub.experiment-report.v1", "generated_at": "2026-08-23T13:00:00Z", "source": {"sha256": "1111111111111111111111111111111111111111111111111111111111111111"}, "review": {"active_edit_ms": 54000, "elapsed_ms": 76000, "changed_cue_count": 5, "keyboard_actions": 43, "edit_events": 14}}
+    }
+  ]
+}

@@ -88,6 +88,19 @@ PYTHONPATH=experiment/src python3 -m sinhalasub.evaluation_cli \
 
 The output contains unblinded system-level rubric means, preference rates with 95% Wilson intervals, categorized critical-error totals, Fleiss' kappa, and confidential genre/challenge strata. Genre and challenge tags exist only in the key, not the evaluator ZIP. Keep both the key and analysis confidential until evaluator scoring is locked.
 
+## Paired Editing-Time Analysis
+
+Join versioned review reports by pseudonymous reviewer and asset under the baseline and contextual conditions:
+
+```sh
+PYTHONPATH=experiment/src python3 -m sinhalasub.editing_cli \
+  experiment/examples/editing-session-manifest.json \
+  --output /tmp/sinhalasub-editing-analysis.json \
+  --allow-not-ready
+```
+
+The confidential manifest embeds each original `sinhalasub.experiment-report.v1` with its assignment. The audit rejects missing pairs, duplicate assignments or reports, source substitutions, invalid telemetry, and fewer than three reviewers. It reports median active editing time by system, the paired median proportional reduction, and a seeded 95% bootstrap interval. The synthetic example passes the 25% metric but remains not ready; `--allow-not-ready` is only a dry-run control.
+
 ## Evaluation Corpus Audit
 
 Audit the small synthetic corpus manifest while explicitly allowing its expected not-ready status:
